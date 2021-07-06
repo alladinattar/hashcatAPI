@@ -15,6 +15,6 @@ func NewHandshakeHandler(l *log.Logger, repository models.HandshakeRepo) *Handsh
 	return &HandshakeHandler{l, repository}
 }
 
-func (hh *HandshakeHandler) ServerHTTP(w http.ResponseWriter, r *http.Request) {
+func (hh *HandshakeHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	handshake, err := hh.handshakeRepo.GetByID(1)
 }
