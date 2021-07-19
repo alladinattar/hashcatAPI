@@ -1,4 +1,4 @@
-package hashcatAPI
+package main
 
 import (
 	"database/sql"
@@ -11,16 +11,18 @@ import (
 
 func main() {
 	l := log.New(os.Stdout, "hshandler", log.LstdFlags)
-	db, err := sql.Open("sqlite", "")
+	db, err := sql.Open("sqlite3", "data.db")
 	if err != nil {
 		l.Fatal(err)
 	}
-	repo := repositories.NewHandshakeRepo(db)
-	hh := handlers.NewHandshakeHandler(l, repo)
+
+	repo := repositories.NewHandshakeRepository(db)
+	hh := handlers.NewHandshakes(l, repo)
 	mux := http.NewServeMux()
-	mux.Handle("/handshake", hh)
+
+	mux.Handle("/handshakes", hh)
 	s := http.Server{
-		Addr:    "9000",
+		Addr:    ":9000",
 		Handler: mux,
 	}
 	err = s.ListenAndServe()
