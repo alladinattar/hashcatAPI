@@ -1,3 +1,3 @@
 # hashcatAPI
 ## Arcitecture
-![Alt text](./media/firstStep.png)
+![Alt text](./imgs/hashcat.png)
