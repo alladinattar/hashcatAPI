@@ -1,0 +1,15 @@
+linters-settings:
+
+  golint:
+    min-confidence: 0
+
+  govet:
+    check-shadowing: true
+
+
+linters:
+  disable-all: true
+  enable:
+    - golint
+    - govet
+    - typecheck
