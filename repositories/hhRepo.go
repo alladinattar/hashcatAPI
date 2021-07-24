@@ -29,7 +29,7 @@ func (r *HandshakeRepository) GetHandshakes() ([]*models.Handshake, error) {
 		handshakes = append(handshakes, handshake)
 	}
 
-	rows.Close() //good habit to close
+	rows.Close()
 	return handshakes, err
 }
 func (r *HandshakeRepository) GetByID(ID int) (*models.Handshake, error) {
@@ -42,4 +42,8 @@ func (r *HandshakeRepository) Save() (int, error) {
 
 func (r *HandshakeRepository) GetByMAC(MAC string) (*models.Handshake, error) {
 	return &models.Handshake{}, nil
+}
+
+func (r *HandshakeRepository) UploadHandshake() {
+
 }

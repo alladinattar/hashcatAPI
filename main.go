@@ -2,6 +2,7 @@ package main
 
 import (
 	"database/sql"
+	"github.com/gorilla/mux"
 	"github.com/hashcatAPI/handlers"
 	"github.com/hashcatAPI/repositories"
 	"log"
@@ -17,10 +18,12 @@ func main() {
 	}
 
 	repo := repositories.NewHandshakeRepository(db)
-	hh := handlers.NewHandshakes(l, repo)
-	mux := http.NewServeMux()
+	hhs := handlers.NewHandshakes(l, repo)
+	uploadHandler := handlers.NewUpload(l, repo)
+	mux := mux.NewRouter()
 
-	mux.Handle("/handshakes", hh)
+	mux.Handle("/handshakes", hhs).Methods("GET")
+	mux.Handle("/upload", uploadHandler).Methods("POST")
 	s := http.Server{
 		Addr:    ":9000",
 		Handler: mux,

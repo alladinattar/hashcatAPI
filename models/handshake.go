@@ -1,7 +1,7 @@
 package models
 
 type Handshake struct {
-	ID         int     `json:"id"`
+	ID         int     `json:"-"`
 	MAC        string  `json:"mac"`
 	SSID       string  `json:"ssid"`
 	Encryption string  `json:"encryption"`
