@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	"github.com/hashcatAPI/models"
-	_ "github.com/mattn/go-sqlite3"
+	_ "github.com/mattn/go-sqlite3" //for sqlite database
 )
 
 type HandshakeRepository struct {
