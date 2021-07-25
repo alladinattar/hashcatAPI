@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/hashcatAPI/models"
 	_ "github.com/mattn/go-sqlite3" //for sqlite database
+	"log"
 )
 
 type HandshakeRepository struct {
@@ -36,8 +37,20 @@ func (r *HandshakeRepository) GetByID(ID int) (*models.Handshake, error) {
 	return &models.Handshake{}, nil
 }
 
-func (r *HandshakeRepository) Save() (int, error) {
-	return 0, nil
+func (r *HandshakeRepository) Save(mac, ssid, password string) (int, error) {
+	query, err := r.db.Prepare("INSERT INTO handshakes(mac, ssid, password) values(?,?,?)")
+	if err != nil {
+		log.Fatal(err)
+		return 0, err
+	}
+
+	res, err := query.Exec(mac, ssid, password)
+	if err != nil {
+		log.Fatal(err)
+		return 0, err
+	}
+	result, _ := res.RowsAffected()
+	return int(result), nil
 }
 
 func (r *HandshakeRepository) GetByMAC(MAC string) (*models.Handshake, error) {
