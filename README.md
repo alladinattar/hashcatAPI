@@ -1,7 +1,7 @@
 # hashcatAPI
 [![linters](https://github.com/rinamuka/hashcatAPI/actions/workflows/linters.yaml/badge.svg?branch=main)](https://github.com/rinamuka/hashcatAPI/actions/workflows/linters.yaml)
 ## Arcitecture
-# General
+### General
 ![Alt text](./imgs/hashcat.png)
-# API
+### API
 ![Alt text](./imgs/api.png)
