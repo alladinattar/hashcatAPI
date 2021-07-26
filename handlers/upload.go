@@ -35,19 +35,20 @@ func (h *UploadHandler) uploadFile(w http.ResponseWriter, r *http.Request) {
 	if err!=nil{
 		h.l.Println(err)
 	}
+	h.l.Println("File recieved")
+	h.l.Println("Run hashcat...")
 	hashcatCMD := exec.Command("hashcat", "-m2500", "test.hccapx", "rockyou.txt", "--outfile", "date:imei.crackes", "--outfile-format", "1,2", "-l", "10000")
 	var out bytes.Buffer
 	hashcatCMD.Stdout = &out
 	err = hashcatCMD.Run()
-	fmt.Println(out.String())
 	if err != nil {
 		log.Println(err)
 	}
+
 	if status := exitStatus(hashcatCMD.ProcessState); status != 0 && status != 1{
 		fmt.Println("Hashcat error")
 		w.WriteHeader(500)
 	} else {
-		fmt.Println("fds")
 		file, err := os.Open("date:imei.crackes")
 		if err != nil {
 			h.l.Println("No cracked handshakes")
@@ -58,6 +59,7 @@ func (h *UploadHandler) uploadFile(w http.ResponseWriter, r *http.Request) {
 		scanner := bufio.NewScanner(file)
 		addedHash := 0
 		for scanner.Scan() {
+			h.l.Println(scanner.Text())
 			crackedPswd := strings.Split(scanner.Text(), ":")
 			count, _ := h.handshakeRepo.Save(crackedPswd[0], crackedPswd[2], "WPA",  r.Header["Imei"][0], r.Header["Date"][0], crackedPswd[3])
 			addedHash+=count
