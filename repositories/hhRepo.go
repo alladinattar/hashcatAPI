@@ -50,7 +50,7 @@ func (r *HandshakeRepository) Save(mac, ssid, encryption, imei, time, password s
 		return 0, err
 	}
 
-	res, err := query.Exec(mac, ssid, encryption, password)
+	res, err := query.Exec(mac, ssid, encryption, imei, time, password)
 	if err != nil {
 		log.Fatal(err)
 		return 0, err
