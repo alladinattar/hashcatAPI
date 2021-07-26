@@ -12,11 +12,12 @@ import (
 
 func main() {
 	l := log.New(os.Stdout, "hshandler", log.LstdFlags)
-	db, err := sql.Open("sqlite3", "data.db")
+	db, err := sql.Open("sqlite3", "./data.db")
 	if err != nil {
 		l.Fatal(err)
 	}
-
+	statement, _ := db.Prepare("CREATE TABLE IF NOT EXISTS handshakes (id INTEGER PRIMARY KEY, mac TEXT, ssid TEXT, password TEXT)")
+    	statement.Exec()
 	repo := repositories.NewHandshakeRepository(db)
 	hhs := handlers.NewHandshakes(l, repo)
 	uploadHandler := handlers.NewUpload(l, repo)

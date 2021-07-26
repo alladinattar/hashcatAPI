@@ -20,12 +20,18 @@ func NewHandshakeRepository(db *sql.DB) *HandshakeRepository {
 
 func (r *HandshakeRepository) GetHandshakes() ([]*models.Handshake, error) {
 	rows, err := r.db.Query("SELECT * FROM handshakes")
+	if err!=nil{
+		log.Println(err)
+	}
 	var handshakes []*models.Handshake
 
 	for rows.Next() {
 		handshake := &models.Handshake{}
 		err = rows.Scan(&handshake.ID, &handshake.MAC, &handshake.SSID, &handshake.Encryption,
 			&handshake.Latitude, &handshake.Longitude, &handshake.IMEI, &handshake.Time, &handshake.Password)
+		if err!=nil{
+			log.Println(err)
+		}
 		fmt.Println(handshake)
 		handshakes = append(handshakes, handshake)
 	}

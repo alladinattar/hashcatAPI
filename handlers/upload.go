@@ -53,7 +53,7 @@ func (h *UploadHandler) uploadFile(w http.ResponseWriter, r *http.Request) {
 	/*imei := r.Header["Imei"]
 	date := r.Header["Date"]*/
 	//tempFile, err := ioutil.TempFile("tempHandshakes", imei[0]+"_"+date[0]+"-*.txt")
-	uploadedFile, err := os.Create("cat.hccapx")
+	uploadedFile, err := os.Create("test.hccapx")
 	defer uploadedFile.Close()
 	if err != nil {
 		fmt.Println(err)
@@ -67,18 +67,19 @@ func (h *UploadHandler) uploadFile(w http.ResponseWriter, r *http.Request) {
 
 	uploadedFile.Write(fileBytes)
 	h.l.Println("File uploaded")
-	hashcatCMD := exec.Command("hashcat", "-m2500", "cat.hccapx", "rockyou.txt", "--outfile", "date:imei.crackes", "--outfile-format", "1,2", "-l", "1000")
+	hashcatCMD := exec.Command("hashcat", "-m2500", "test.hccapx", "rockyou.txt", "--outfile", "date:imei.crackes", "--outfile-format", "1,2", "-l", "10000")
 	var out bytes.Buffer
 	hashcatCMD.Stdout = &out
 	err = hashcatCMD.Run()
+	fmt.Println(out.String())
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err)
 	}
-	if status := exitStatus(hashcatCMD.ProcessState); status != 0 {
+	if status := exitStatus(hashcatCMD.ProcessState); status != 0 && status != 1{
 		fmt.Println("Hashcat error")
 		w.WriteHeader(500)
 	} else {
-		fmt.Println()
+		fmt.Println("fds")
 		file, err := os.Open("date:imei.crackes")
 		if err != nil {
 			log.Fatal(err)
