@@ -20,7 +20,7 @@ func NewHandshakeRepository(db *sql.DB) *HandshakeRepository {
 
 func (r *HandshakeRepository) GetHandshakes() ([]*models.Handshake, error) {
 	rows, err := r.db.Query("SELECT * FROM handshakes")
-	if err!=nil{
+	if err != nil {
 		log.Println(err)
 	}
 	var handshakes []*models.Handshake
@@ -29,7 +29,7 @@ func (r *HandshakeRepository) GetHandshakes() ([]*models.Handshake, error) {
 		handshake := &models.Handshake{}
 		err = rows.Scan(&handshake.ID, &handshake.MAC, &handshake.SSID, &handshake.Encryption,
 			&handshake.Latitude, &handshake.Longitude, &handshake.IMEI, &handshake.Time, &handshake.Password)
-		if err!=nil{
+		if err != nil {
 			log.Println(err)
 		}
 		fmt.Println(handshake)
@@ -43,14 +43,14 @@ func (r *HandshakeRepository) GetByID(ID int) (*models.Handshake, error) {
 	return &models.Handshake{}, nil
 }
 
-func (r *HandshakeRepository) Save(mac, ssid, password string) (int, error) {
-	query, err := r.db.Prepare("INSERT INTO handshakes(mac, ssid, password) values(?,?,?)")
+func (r *HandshakeRepository) Save(mac, ssid, encryption, imei, time, password string) (int, error) {
+	query, err := r.db.Prepare("INSERT INTO handshakes(mac, ssid,encryption, imei, time, password) values(?,?,?,?,?,?)")
 	if err != nil {
 		log.Fatal(err)
 		return 0, err
 	}
 
-	res, err := query.Exec(mac, ssid, password)
+	res, err := query.Exec(mac, ssid, encryption, password)
 	if err != nil {
 		log.Fatal(err)
 		return 0, err
@@ -61,8 +61,4 @@ func (r *HandshakeRepository) Save(mac, ssid, password string) (int, error) {
 
 func (r *HandshakeRepository) GetByMAC(MAC string) (*models.Handshake, error) {
 	return &models.Handshake{}, nil
-}
-
-func (r *HandshakeRepository) UploadHandshake() {
-
 }

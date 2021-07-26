@@ -13,7 +13,7 @@ type Handshake struct {
 }
 
 type HandshakeRepository interface {
-	Save(string, string, string) (int, error)
+	Save(string, string, string, string, string, string) (int, error)
 	GetByID(ID int) (*Handshake, error)
 	GetByMAC(MAC string) (*Handshake, error)
 	GetHandshakes() ([]*Handshake, error)

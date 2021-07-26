@@ -14,8 +14,6 @@ import (
 	"syscall"
 )
 
-var pidSlice []int
-
 type UploadHandler struct {
 	l             *log.Logger
 	handshakeRepo models.HandshakeRepository
@@ -26,9 +24,8 @@ func NewUpload(l *log.Logger, repository models.HandshakeRepository) *UploadHand
 }
 
 func (h *UploadHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	h.l.Println("Start upload handler")
 	h.uploadFile(w, r)
-	/*h.l.Println("Send all handshakes")
-	h.getHandshakes(w, r)*/
 	return
 }
 
@@ -82,17 +79,22 @@ func (h *UploadHandler) uploadFile(w http.ResponseWriter, r *http.Request) {
 		fmt.Println("fds")
 		file, err := os.Open("date:imei.crackes")
 		if err != nil {
-			log.Fatal(err)
+			h.l.Println("No cracked handshakes")
+			return
 		}
 		defer file.Close()
 
 		scanner := bufio.NewScanner(file)
 		for scanner.Scan() {
 			crackedPswd := strings.Split(scanner.Text(), ":")
-			h.handshakeRepo.Save(crackedPswd[0], crackedPswd[2], crackedPswd[3])
+			h.handshakeRepo.Save(crackedPswd[0], crackedPswd[2], "WPA",  r.Header["Imei"][0], r.Header["Date"][0], crackedPswd[3])
 		}
 		if err := scanner.Err(); err != nil {
-			log.Fatal(err)
+			h.l.Println(err)
+		}
+		err = os.Remove("date:imei.crackes")
+		if err!=nil{
+			h.l.Println(err)
 		}
 	}
 }
