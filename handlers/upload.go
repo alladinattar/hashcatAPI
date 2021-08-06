@@ -48,7 +48,8 @@ func (h *UploadHandler) uploadFile(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(500)
 	} else if status == 0 {
 		if strings.Contains(out.String(), "found in potfile") {
-			hashcatCMD := exec.Command("hashcat", "-m2500", "./"+file.Name(), "/usr/share/wordlists/fasttrack.txt", "--show")
+			h.l.Println("Found in potfile")
+			hashcatCMD := exec.Command("hashcat", "-m2500", "./"+file.Name(), "/usr/share/wordlists/rockyou.txt", "--show")
 			var out bytes.Buffer
 			hashcatCMD.Stdout = &out
 			err = hashcatCMD.Run()
@@ -78,7 +79,6 @@ func (h *UploadHandler) uploadFile(w http.ResponseWriter, r *http.Request) {
 		defer file.Close()
 
 		content, _ := ioutil.ReadFile(file.Name())
-		h.l.Println(string(content))
 		separateContent := strings.Split(string(content), ":")
 		var response struct {
 			Ssid     string `json:"ssid"`
