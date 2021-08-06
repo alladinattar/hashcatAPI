@@ -60,7 +60,7 @@ func (ha *HashcatAdapter) CrackWPA(file *os.File) (*models.CrackResult, error) {
 		defer file.Close()
 
 		content, _ := ioutil.ReadFile(file.Name())
-		data := strings.Split(string(content), ":")
+		data := strings.Split(strings.Replace(string(content), "\n", "", 1), ":")
 		response := models.CrackResult{
 			Password: data[3],
 			Ssid:     data[2],
