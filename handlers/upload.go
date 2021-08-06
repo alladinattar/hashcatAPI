@@ -1,19 +1,14 @@
 package handlers
 
 import (
-	"bytes"
 	"encoding/json"
+	"github.com/hashcatAPI/adapters"
 	"github.com/hashcatAPI/models"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
-	"os/exec"
-	"strings"
-	"syscall"
 )
-
-var counter int
 
 type UploadHandler struct {
 	l             *log.Logger
@@ -25,87 +20,28 @@ func NewUpload(l *log.Logger, repository models.HandshakeRepository) *UploadHand
 }
 
 func (h *UploadHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	h.uploadFile(w, r)
+	h.bruteHandshake(w, r)
 	return
 }
 
-type Response struct {
-	Ssid     string `json:"ssid,omitempty"`
-	Password string `json:"password,omitempty"`
-	Mac      string `json:"mac,omitempty"`
-	Status   string `json:"status"`
-}
-
-func (h *UploadHandler) uploadFile(w http.ResponseWriter, r *http.Request) {
+func (h *UploadHandler) bruteHandshake(w http.ResponseWriter, r *http.Request) {
 	file, err := receiveFile(r)
 	if err != nil {
 		h.l.Println(err)
 	}
 	h.l.Println("File recieved: ", file.Name())
 	h.l.Println("Run hashcat with file ", file.Name())
-	defer os.Remove(file.Name())
-	hashcatCMD := exec.Command("hashcat", "-m2500", "./"+file.Name(), "/usr/share/wordlists/rockyou.txt", "--outfile", "result", "--outfile-format", "1,2", "-l", "10000")
-	var out bytes.Buffer
-	hashcatCMD.Stdout = &out
-	err = hashcatCMD.Run()
-
-	if status := exitStatus(hashcatCMD.ProcessState); status != 0 && status != 1 {
-		h.l.Println("Hashcat error")
-		w.Write([]byte("Hashcat error"))
-		w.WriteHeader(500)
-	} else if status == 0 {
-		if strings.Contains(out.String(), "found in potfile") {
-			h.l.Println("Found in potfile")
-			hashcatCMD := exec.Command("hashcat", "-m2500", "./"+file.Name(), "/usr/share/wordlists/rockyou.txt", "--show")
-			var out bytes.Buffer
-			hashcatCMD.Stdout = &out
-			err = hashcatCMD.Run()
-			if err != nil {
-				h.l.Println("Failed read potfile:", err)
-			}
-
-			data := strings.Split(strings.Replace(out.String(), "\n", "", 1), ":")
-			response := Response{}
-			response.Password = data[3]
-			response.Ssid = data[2]
-			response.Mac = data[0]
-			response.Status = "Cracked"
-			result, err := json.MarshalIndent(response, "", "  ")
-			if err != nil {
-				h.l.Println("Failed encode response:", err)
-			}
-			w.Write(result)
-			return
-		}
-		file, err := os.Open("result")
-		if err != nil {
-			h.l.Println("No cracked handshakes")
-			w.WriteHeader(200)
-			return
-		}
-		defer os.Remove(file.Name())
-		defer file.Close()
-
-		content, _ := ioutil.ReadFile(file.Name())
-		separateContent := strings.Split(string(content), ":")
-		response := Response{}
-		response.Password = separateContent[3]
-		response.Ssid = separateContent[2]
-		response.Mac = separateContent[0]
-		response.Status = "Cracked"
-		err = json.NewEncoder(w).Encode(&response)
-		if err != nil {
-			h.l.Println("Failed encode response:", err)
-		}
-	} else {
-		response := Response{}
-		response.Status = "Exhausted"
-		w.WriteHeader(200)
-		err = json.NewEncoder(w).Encode(response)
-		if err != nil {
-			h.l.Println("Failed encode response", err)
-		}
+	cracker := adapters.NewHashcatAdapter("/usr/share/wordlists/rockyou.txt", h.l)
+	result, err := cracker.CrackWPA(file)
+	if err != nil {
+		h.l.Println("crack wpa error", err)
 	}
+	response, err := json.MarshalIndent(result, "", "  ")
+	if err != nil {
+		h.l.Println("Failed marshall response", err)
+	}
+	w.Write(response)
+	defer os.Remove(file.Name())
 
 }
 
@@ -132,12 +68,4 @@ func receiveFile(r *http.Request) (*os.File, error) {
 
 	uploadedFile.Write(fileBytes)
 	return uploadedFile, nil
-}
-
-func exitStatus(state *os.ProcessState) int {
-	status, ok := state.Sys().(syscall.WaitStatus)
-	if !ok {
-		return -1
-	}
-	return status.ExitStatus()
 }
