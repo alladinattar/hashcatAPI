@@ -101,7 +101,7 @@ func (h *UploadHandler) uploadFile(w http.ResponseWriter, r *http.Request) {
 			Mac      string `json:"mac",omitempty`
 			Status   string `json:"status"`
 		}
-		response.Status = "Exhausted"
+		//response.Status = "Exhausted"
 		w.WriteHeader(200)
 		err = json.NewEncoder(w).Encode(response)
 		if err != nil {
