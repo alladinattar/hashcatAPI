@@ -47,6 +47,7 @@ func (h *UploadHandler) uploadFile(w http.ResponseWriter, r *http.Request) {
 
 	if status := exitStatus(hashcatCMD.ProcessState); status != 0 && status != 1 {
 		h.l.Println("Hashcat error")
+		w.Write([]byte("Hashcat error"))
 		w.WriteHeader(500)
 	} else if status == 0 {
 		file, err := os.Open("result")
@@ -72,6 +73,9 @@ func (h *UploadHandler) uploadFile(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			h.l.Println("Failed encode response:", err)
 		}
+	} else {
+		w.WriteHeader(200)
+		w.Write([]byte("Exhausted"))
 	}
 
 }
