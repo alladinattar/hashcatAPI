@@ -52,6 +52,7 @@ func (h *UploadHandler) uploadFile(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(500)
 	} else {
 		file, err := os.Open("result")
+		h.l.Println(file.Name())
 		defer os.Remove(file.Name())
 		defer file.Close()
 		if err != nil {
