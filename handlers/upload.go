@@ -39,13 +39,13 @@ func (h *UploadHandler) uploadFile(w http.ResponseWriter, r *http.Request) {
 	defer os.Remove(file.Name())
 	h.l.Println("hashcat", "-m2500", "./"+file.Name(), "/usr/share/wordlists/fasttrack.txt", "--outfile", "result", "--outfile-format", "1,2", "-l", "10000")
 	hashcatCMD := exec.Command("hashcat", "-m2500", "./"+file.Name(), "/usr/share/wordlists/fasttrack.txt", "--outfile", "result", "--outfile-format", "1,2", "-l", "10000")
-
 	var out bytes.Buffer
 	hashcatCMD.Stdout = &out
 	err = hashcatCMD.Run()
 	if err != nil {
 		h.l.Println("Failed run hashcat:", err)
 	}
+	h.l.Println(out.String())
 
 	if status := exitStatus(hashcatCMD.ProcessState); status != 0 && status != 1 {
 		h.l.Println("Hashcat error")
