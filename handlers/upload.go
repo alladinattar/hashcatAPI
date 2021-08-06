@@ -53,7 +53,7 @@ func (h *UploadHandler) uploadFile(w http.ResponseWriter, r *http.Request) {
 	} else {
 		file, err := os.Open("result")
 		h.l.Println(file.Name())
-		defer os.Remove(file.Name())
+		//defer os.Remove(file.Name())
 		defer file.Close()
 		if err != nil {
 			h.l.Println("No cracked handshakes")
