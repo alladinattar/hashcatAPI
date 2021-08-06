@@ -35,7 +35,7 @@ func (h *UploadHandler) uploadFile(w http.ResponseWriter, r *http.Request) {
 		h.l.Println(err)
 	}
 	h.l.Println("File recieved: ", file.Name())
-	h.l.Println("Run hashcat ...")
+	h.l.Println("Run hashcat with file ", file.Name())
 	defer os.Remove(file.Name())
 	hashcatCMD := exec.Command("hashcat", "-m2500", file.Name(), "/usr/share/wordlists/fasttrack.txt", "--outfile", "result", "--outfile-format", "1,2", "-l", "10000")
 	var out bytes.Buffer
