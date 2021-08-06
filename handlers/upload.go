@@ -45,12 +45,12 @@ func (h *UploadHandler) uploadFile(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		h.l.Println("Failed run hashcat:", err)
 	}
-	h.l.Println(out.String())
+	//h.l.Println(out.String())
 
 	if status := exitStatus(hashcatCMD.ProcessState); status != 0 && status != 1 {
 		h.l.Println("Hashcat error")
 		w.WriteHeader(500)
-	} else {
+	} else if status == 0 {
 		file, err := os.Open("result")
 		h.l.Println(file.Name())
 		//defer os.Remove(file.Name())
