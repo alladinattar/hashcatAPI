@@ -96,14 +96,17 @@ func (h *UploadHandler) uploadFile(w http.ResponseWriter, r *http.Request) {
 		}
 	} else {
 		var response struct {
-			Ssid     string `json:"ssid"`
-			Password string `json:"password"`
-			Mac      string `json:"mac"`
+			Ssid     string `json:"ssid",omitempty`
+			Password string `json:"password",omitempty`
+			Mac      string `json:"mac",omitempty`
 			Status   string `json:"status"`
 		}
 		response.Status = "Exhausted"
 		w.WriteHeader(200)
-		json.NewEncoder(w).Encode(response)
+		err = json.NewEncoder(w).Encode(response)
+		if err != nil {
+			h.l.Println("Failed encode response", err)
+		}
 	}
 
 }
