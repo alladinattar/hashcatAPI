@@ -60,6 +60,7 @@ func (h *UploadHandler) uploadFile(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		content, _ := ioutil.ReadFile(file.Name())
+		h.l.Println(string(content))
 		separateContent := strings.Split(string(content), ":")
 		var response struct {
 			Ssid     string `json:"ssid"`
