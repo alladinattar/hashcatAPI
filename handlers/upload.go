@@ -69,7 +69,11 @@ func (h *UploadHandler) uploadFile(w http.ResponseWriter, r *http.Request) {
 			response.Password = data[3]
 			response.Ssid = data[2]
 			response.Mac = data[0]
-			json.NewEncoder(w).Encode(response)
+			response.Status = "Cracked"
+			err = json.NewEncoder(w).Encode(&response)
+			if err != nil {
+				h.l.Println("Failed encode response:", err)
+			}
 			return
 		}
 		file, err := os.Open("result")
@@ -84,7 +88,6 @@ func (h *UploadHandler) uploadFile(w http.ResponseWriter, r *http.Request) {
 		content, _ := ioutil.ReadFile(file.Name())
 		separateContent := strings.Split(string(content), ":")
 		response := Response{}
-
 		response.Password = separateContent[3]
 		response.Ssid = separateContent[2]
 		response.Mac = separateContent[0]
