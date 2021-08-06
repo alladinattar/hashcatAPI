@@ -42,10 +42,8 @@ func (h *UploadHandler) uploadFile(w http.ResponseWriter, r *http.Request) {
 	var out bytes.Buffer
 	hashcatCMD.Stdout = &out
 	err = hashcatCMD.Run()
-	if err != nil {
-		h.l.Println("Failed run hashcat:", err)
-	}
-	//h.l.Println(out.String())
+
+	h.l.Println(out.String())
 
 	if status := exitStatus(hashcatCMD.ProcessState); status != 0 && status != 1 {
 		h.l.Println("Hashcat error")
@@ -53,7 +51,7 @@ func (h *UploadHandler) uploadFile(w http.ResponseWriter, r *http.Request) {
 	} else if status == 0 {
 		file, err := os.Open("result")
 		h.l.Println(file.Name())
-		//defer os.Remove(file.Name())
+		defer os.Remove(file.Name())
 		defer file.Close()
 		if err != nil {
 			h.l.Println("No cracked handshakes")
