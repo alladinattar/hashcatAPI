@@ -58,7 +58,16 @@ func (h *UploadHandler) uploadFile(w http.ResponseWriter, r *http.Request) {
 			if err != nil {
 				h.l.Println("Failed read potfile:", err)
 			}
-			h.l.Println(out.String())
+			data := strings.Split(out.String(), ":")
+			var response struct {
+				Ssid     string `json:"ssid"`
+				Password string `json:"password"`
+				Mac      string `json:"mac"`
+			}
+			response.Password = data[3]
+			response.Ssid = data[2]
+			response.Mac = data[0]
+			json.NewEncoder(w).Encode(response)
 		}
 		file, err := os.Open("result")
 		if err != nil {
