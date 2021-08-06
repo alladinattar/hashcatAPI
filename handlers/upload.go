@@ -3,7 +3,6 @@ package handlers
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
 	"github.com/hashcatAPI/models"
 	"io/ioutil"
 	"log"
@@ -51,15 +50,7 @@ func (h *UploadHandler) uploadFile(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("Hashcat error"))
 		w.WriteHeader(500)
 	} else if status == 0 {
-		files, err := ioutil.ReadDir(".")
-		if err != nil {
-			log.Fatal(err)
-		}
-
-		for _, file := range files {
-			fmt.Println(file.Name(), file.IsDir())
-		}
-		file, err := os.Open("result")
+		file, err := os.Create("result")
 		h.l.Println(file.Name())
 		defer os.Remove(file.Name())
 		defer file.Close()
