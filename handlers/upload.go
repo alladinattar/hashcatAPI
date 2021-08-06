@@ -43,7 +43,7 @@ func (h *UploadHandler) uploadFile(w http.ResponseWriter, r *http.Request) {
 	hashcatCMD.Stdout = &out
 	err = hashcatCMD.Run()
 
-	//h.l.Println(out.String())
+	h.l.Println(out.String())
 
 	if status := exitStatus(hashcatCMD.ProcessState); status != 0 && status != 1 {
 		h.l.Println("Hashcat error")
