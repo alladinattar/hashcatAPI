@@ -58,7 +58,8 @@ func (h *UploadHandler) uploadFile(w http.ResponseWriter, r *http.Request) {
 			if err != nil {
 				h.l.Println("Failed read potfile:", err)
 			}
-			data := strings.Split(out.String(), ":")
+
+			data := strings.Split(strings.Replace(out.String(), "\n", "", 1), ":")
 			var response struct {
 				Ssid     string `json:"ssid"`
 				Password string `json:"password"`
