@@ -70,10 +70,11 @@ func (h *UploadHandler) uploadFile(w http.ResponseWriter, r *http.Request) {
 			response.Ssid = data[2]
 			response.Mac = data[0]
 			response.Status = "Cracked"
-			err = json.NewEncoder(w).Encode(&response)
+			result, err := json.MarshalIndent(response, "", "  ")
 			if err != nil {
 				h.l.Println("Failed encode response:", err)
 			}
+			w.Write(result)
 			return
 		}
 		file, err := os.Open("result")
