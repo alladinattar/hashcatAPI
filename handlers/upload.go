@@ -50,15 +50,16 @@ func (h *UploadHandler) uploadFile(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("Hashcat error"))
 		w.WriteHeader(500)
 	} else if status == 0 {
-		file, err := os.Create("result")
-		h.l.Println(file.Name())
-		defer os.Remove(file.Name())
-		defer file.Close()
+		file, err := os.Open("result")
 		if err != nil {
 			h.l.Println("No cracked handshakes")
 			w.WriteHeader(200)
 			return
 		}
+		h.l.Println(file.Name())
+		defer os.Remove(file.Name())
+		defer file.Close()
+
 		content, _ := ioutil.ReadFile(file.Name())
 		h.l.Println(string(content))
 		separateContent := strings.Split(string(content), ":")
