@@ -68,6 +68,7 @@ func (h *UploadHandler) uploadFile(w http.ResponseWriter, r *http.Request) {
 			response.Ssid = data[2]
 			response.Mac = data[0]
 			json.NewEncoder(w).Encode(response)
+			return
 		}
 		file, err := os.Open("result")
 		if err != nil {
