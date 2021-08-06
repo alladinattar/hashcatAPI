@@ -50,6 +50,16 @@ func (h *UploadHandler) uploadFile(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("Hashcat error"))
 		w.WriteHeader(500)
 	} else if status == 0 {
+		if strings.Contains(out.String(), "found in potfile") {
+			hashcatCMD := exec.Command("hashcat", "-m2500", "./"+file.Name(), "/usr/share/wordlists/fasttrack.txt", "--show")
+			var out bytes.Buffer
+			hashcatCMD.Stdout = &out
+			err = hashcatCMD.Run()
+			if err != nil {
+				h.l.Println("Failed read potfile:", err)
+			}
+			h.l.Println(out.String())
+		}
 		file, err := os.Open("result")
 		if err != nil {
 			h.l.Println("No cracked handshakes")
