@@ -67,7 +67,10 @@ func (h *UploadHandler) uploadFile(w http.ResponseWriter, r *http.Request) {
 		response.Password = separateContent[3]
 		response.Ssid = separateContent[2]
 		response.Mac = separateContent[0]
-		json.NewEncoder(w).Encode(response)
+		err = json.NewEncoder(w).Encode(response)
+		if err != nil {
+			h.l.Println("Failed encode response:", err)
+		}
 	}
 
 }
