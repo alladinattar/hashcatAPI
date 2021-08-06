@@ -29,6 +29,13 @@ func (h *UploadHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	return
 }
 
+type Response struct {
+	Ssid     string `json:"ssid,omitempty"`
+	Password string `json:"password,omitempty"`
+	Mac      string `json:"mac,omitempty"`
+	Status   string `json:"status"`
+}
+
 func (h *UploadHandler) uploadFile(w http.ResponseWriter, r *http.Request) {
 	file, err := receiveFile(r)
 	if err != nil {
@@ -58,11 +65,7 @@ func (h *UploadHandler) uploadFile(w http.ResponseWriter, r *http.Request) {
 			}
 
 			data := strings.Split(strings.Replace(out.String(), "\n", "", 1), ":")
-			var response struct {
-				Ssid     string `json:"ssid"`
-				Password string `json:"password"`
-				Mac      string `json:"mac"`
-			}
+			response := Response{}
 			response.Password = data[3]
 			response.Ssid = data[2]
 			response.Mac = data[0]
@@ -80,28 +83,19 @@ func (h *UploadHandler) uploadFile(w http.ResponseWriter, r *http.Request) {
 
 		content, _ := ioutil.ReadFile(file.Name())
 		separateContent := strings.Split(string(content), ":")
-		var response struct {
-			Ssid     string `json:"ssid"`
-			Password string `json:"password"`
-			Mac      string `json:"mac"`
-			Status   string `json:"status"`
-		}
+		response := Response{}
+
 		response.Password = separateContent[3]
 		response.Ssid = separateContent[2]
 		response.Mac = separateContent[0]
 		response.Status = "Cracked"
-		err = json.NewEncoder(w).Encode(response)
+		err = json.NewEncoder(w).Encode(&response)
 		if err != nil {
 			h.l.Println("Failed encode response:", err)
 		}
 	} else {
-		var response struct {
-			Ssid     string `json:"ssid",omitempty`
-			Password string `json:"password",omitempty`
-			Mac      string `json:"mac",omitempty`
-			Status   string `json:"status"`
-		}
-		//response.Status = "Exhausted"
+		response := Response{}
+		response.Status = "Exhausted"
 		w.WriteHeader(200)
 		err = json.NewEncoder(w).Encode(response)
 		if err != nil {
