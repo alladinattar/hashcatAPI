@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"encoding/json"
-	"github.com/hashcatAPI/adapters"
 	"github.com/hashcatAPI/models"
 	"io/ioutil"
 	"log"
@@ -10,39 +9,38 @@ import (
 	"os"
 )
 
-type UploadHandler struct {
-	l             *log.Logger
+type CrackHandler struct {
 	handshakeRepo models.HandshakeRepository
+	wpaCracker    models.Cracker
 }
 
-func NewUpload(l *log.Logger, repository models.HandshakeRepository) *UploadHandler {
-	return &UploadHandler{l, repository}
+func NewUploadHandler(repository models.HandshakeRepository, wpaCracker models.Cracker) *CrackHandler {
+	return &CrackHandler{repository, wpaCracker}
 }
 
-func (h *UploadHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+func (h *CrackHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	h.bruteHandshake(w, r)
 	return
 }
 
-func (h *UploadHandler) bruteHandshake(w http.ResponseWriter, r *http.Request) {
+func (h *CrackHandler) bruteHandshake(w http.ResponseWriter, r *http.Request) {
 	file, err := receiveFile(r)
 	if err != nil {
-		h.l.Println(err)
+		log.Println(err)
+		w.WriteHeader(400)
 	}
-	h.l.Println("File recieved: ", file.Name())
-	h.l.Println("Run hashcat with file ", file.Name())
-	cracker := adapters.NewHashcatAdapter("/usr/share/wordlists/rockyou.txt", h.l)
-	result, err := cracker.CrackWPA(file)
+	log.Println("File recieved: ", file.Name())
+	log.Println("Run hashcat with file ", file.Name())
+	result, err := h.wpaCracker.CrackWPA(file)
 	if err != nil {
-		h.l.Println("crack wpa error", err)
+		log.Println("crack tool error", err)
 	}
 	response, err := json.MarshalIndent(result, "", "  ")
 	if err != nil {
-		h.l.Println("Failed marshall response", err)
+		log.Println("Failed marshall response", err)
 	}
 	w.Write(response)
 	defer os.Remove(file.Name())
-
 }
 
 func receiveFile(r *http.Request) (*os.File, error) {
@@ -53,7 +51,6 @@ func receiveFile(r *http.Request) (*os.File, error) {
 	file, _, err := r.FormFile("file")
 	if err != nil {
 		return nil, err
-		//w.WriteHeader(204)
 	}
 	defer file.Close()
 	uploadedFile, err := ioutil.TempFile("./tempHandshakes", "shake-*.hccapx")

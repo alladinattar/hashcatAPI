@@ -23,7 +23,7 @@ func (h *HandshakesHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *HandshakesHandler) getHandshakes(w http.ResponseWriter, r *http.Request) {
-	handshakes, err := h.handshakeRepo.GetHandshakes()
+	handshakes, err := h.handshakeRepo.GetAll()
 	if err != nil {
 		h.l.Println("Error when get handshakes")
 		w.WriteHeader(500)
