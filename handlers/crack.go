@@ -32,21 +32,22 @@ func (h *CrackHandler) bruteHandshake(w http.ResponseWriter, r *http.Request) {
 	}
 	log.Println("File recieved: ", file.Name())
 	log.Println("Run hashcat with file ", file.Name())
-	result, err := h.wpaCracker.CrackWPA(file)
+	handshakes, err := h.wpaCracker.CrackWPA(file)
 	if err != nil {
 		log.Println("crack tool error", err)
 	}
-	handshakes, err := json.MarshalIndent(result, "", "  ")
-	if err != nil {
-		log.Println("Failed marshall response", err)
-	}
-	fmt.Println(string(handshakes))
 	if len(handshakes) == 0 {
 		fmt.Println("fsdf")
 		w.Write([]byte("No cracked handshakes"))
 		return
 	}
-	w.Write(handshakes)
+	result, err := json.MarshalIndent(handshakes, "", "  ")
+	if err != nil {
+		log.Println("Failed marshall response", err)
+	}
+	fmt.Println(string(result))
+
+	w.Write(result)
 	defer os.Remove(file.Name())
 }
 
