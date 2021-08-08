@@ -30,6 +30,8 @@ func (h *CrackHandler) bruteHandshake(w http.ResponseWriter, r *http.Request) {
 		log.Println(err)
 		w.WriteHeader(400)
 	}
+	defer file.Close()
+	defer os.Remove(file.Name())
 	log.Println("File recieved: ", file.Name())
 	log.Println("Run hashcat with file ", file.Name())
 	handshakes, err := h.wpaCracker.CrackWPA(file)
@@ -48,8 +50,6 @@ func (h *CrackHandler) bruteHandshake(w http.ResponseWriter, r *http.Request) {
 	fmt.Println(string(result))
 
 	w.Write(result)
-	defer file.Close()
-	defer os.Remove(file.Name())
 }
 
 func receiveFile(r *http.Request) (*os.File, error) {
@@ -63,7 +63,6 @@ func receiveFile(r *http.Request) (*os.File, error) {
 	}
 	defer file.Close()
 	uploadedFile, err := ioutil.TempFile("./tempHandshakes", "shake-*.hccapx")
-	defer uploadedFile.Close()
 	if err != nil {
 		return nil, err
 	}
