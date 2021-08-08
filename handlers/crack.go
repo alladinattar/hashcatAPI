@@ -47,6 +47,7 @@ func (h *CrackHandler) bruteHandshake(w http.ResponseWriter, r *http.Request) {
 	fmt.Println(string(result))
 
 	w.Write(result)
+	defer file.Close()
 	defer os.Remove(file.Name())
 }
 
