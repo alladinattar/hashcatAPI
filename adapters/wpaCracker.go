@@ -25,10 +25,8 @@ func (ha *HashcatAdapter) CrackWPA(file *os.File) ([]*models.Handshake, error) {
 	hashcatCMD := exec.Command("hashcat", "-m2500", file.Name(), ha.wordList, "-l", strconv.Itoa(ha.limit))
 	var out bytes.Buffer
 	hashcatCMD.Stdout = &out
-	err := hashcatCMD.Run()
-	if err != nil {
-		return nil, err
-	}
+	hashcatCMD.Run()
+
 	if status := exitStatus(hashcatCMD.ProcessState); status != 0 && status != 1 {
 		log.Println("Hashcat error")
 		return []*models.Handshake{{Status: "Hashcat error"}}, errors.New("Hashcat error")
