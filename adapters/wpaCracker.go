@@ -3,6 +3,7 @@ package adapters
 import (
 	"bytes"
 	"errors"
+	"fmt"
 	"github.com/hashcatAPI/models"
 	"log"
 	"os"
@@ -25,6 +26,7 @@ func (ha *HashcatAdapter) CrackWPA(file *os.File) ([]*models.Handshake, error) {
 	var out bytes.Buffer
 	hashcatCMD.Stdout = &out
 	err := hashcatCMD.Run()
+	fmt.Println(out.String())
 	if err != nil {
 		return nil, err
 	}
