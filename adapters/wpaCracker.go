@@ -11,6 +11,7 @@ import (
 	"strconv"
 	"strings"
 	"syscall"
+	"time"
 )
 
 type HashcatAdapter struct {
@@ -60,10 +61,12 @@ func (ha HashcatAdapter) readPotfile(file *os.File) ([]*models.Handshake, error)
 		}
 		separatedData := strings.Split(line, ":")
 		response := models.Handshake{
-			Password: separatedData[3],
-			SSID:     separatedData[2],
-			MAC:      separatedData[0],
-			Status:   "Cracked",
+			Password:   separatedData[3],
+			SSID:       separatedData[2],
+			MAC:        separatedData[0],
+			Status:     "Cracked",
+			Encryption: "WPA/WPA2",
+			Time:       time.Now().String(),
 		}
 		crackedHandshakes = append(crackedHandshakes, &response)
 	}
