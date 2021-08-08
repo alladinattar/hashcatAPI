@@ -41,6 +41,10 @@ func (h *CrackHandler) bruteHandshake(w http.ResponseWriter, r *http.Request) {
 		log.Println("Failed marshall response", err)
 	}
 	fmt.Println(string(handshakes))
+	if len(handshakes) == 0 {
+		w.Write([]byte("No cracked handshakes"))
+		return
+	}
 	w.Write(handshakes)
 	defer os.Remove(file.Name())
 }
