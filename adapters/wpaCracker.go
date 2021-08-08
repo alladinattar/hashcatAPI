@@ -3,7 +3,6 @@ package adapters
 import (
 	"bytes"
 	"errors"
-	"fmt"
 	"github.com/hashcatAPI/models"
 	"log"
 	"os"
@@ -22,11 +21,10 @@ func NewHashcat(wordlist string, limit int) *HashcatAdapter {
 }
 
 func (ha *HashcatAdapter) CrackWPA(file *os.File) ([]*models.Handshake, error) {
-	hashcatCMD := exec.Command("hashcat", "-m2500", "./"+file.Name(), ha.wordList, "-l", string(ha.limit))
+	hashcatCMD := exec.Command("hashcat", "-m2500", "tempHandshakes/"+file.Name(), ha.wordList, "-l", string(ha.limit))
 	var out bytes.Buffer
 	hashcatCMD.Stdout = &out
 	err := hashcatCMD.Run()
-	fmt.Println(out.String())
 	if err != nil {
 		return nil, err
 	}
@@ -36,7 +34,6 @@ func (ha *HashcatAdapter) CrackWPA(file *os.File) ([]*models.Handshake, error) {
 	} else {
 		crackedShakes, err := ha.readPotfile(file)
 		if err != nil {
-			log.Println("fadsfasdfassdfasd")
 			return nil, err
 		}
 		return crackedShakes, nil
