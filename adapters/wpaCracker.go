@@ -52,7 +52,7 @@ func (ha HashcatAdapter) readPotfile(file *os.File) ([]*models.Handshake, error)
 		return []*models.Handshake{}, nil
 	}
 	crackedHandshakes := []*models.Handshake{}
-	fmt.Println(out.String())
+	fmt.Println(out)
 	data := strings.Split(out.String(), "\n")
 	for _, line := range data {
 		separatedData := strings.Split(line, ":")
