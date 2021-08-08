@@ -3,7 +3,7 @@ package main
 import (
 	"database/sql"
 	"github.com/gorilla/mux"
-	"github.com/hashcatAPI/server"
+	"github.com/hashcatAPI/app"
 	"log"
 )
 
@@ -16,6 +16,6 @@ func main() {
 	statement.Exec()
 
 	mux := mux.NewRouter()
-	server.SetupRouter(mux)
-	server.Run(mux)
+	app.SetupRouter(mux)
+	app.Run(mux)
 }

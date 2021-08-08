@@ -8,16 +8,15 @@ import (
 )
 
 type HandshakesHandler struct {
-	l             *log.Logger
 	handshakeRepo models.HandshakeRepository
 }
 
-func NewHandshakes(l *log.Logger, repository models.HandshakeRepository) *HandshakesHandler {
-	return &HandshakesHandler{l, repository}
+func NewHandshakes( repository models.HandshakeRepository) *HandshakesHandler {
+	return &HandshakesHandler{ repository}
 }
 
 func (h *HandshakesHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	h.l.Println("Send all handshakes")
+	log.Println("Send all handshakes")
 	h.getHandshakes(w, r)
 	return
 }
@@ -25,14 +24,14 @@ func (h *HandshakesHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 func (h *HandshakesHandler) getHandshakes(w http.ResponseWriter, r *http.Request) {
 	handshakes, err := h.handshakeRepo.GetAll()
 	if err != nil {
-		h.l.Println("Error when get handshakes")
+		log.Println("Error when get handshakes")
 		w.WriteHeader(500)
 		return
 	}
 
 	result, err := json.MarshalIndent(handshakes, "", "  ")
 	if err != nil {
-		h.l.Println("Cannot Marshall handshakes")
+		log.Println("Cannot Marshall handshakes")
 		w.WriteHeader(500)
 		return
 	}

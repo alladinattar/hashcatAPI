@@ -21,7 +21,7 @@ func NewHashcat(wordlist string, limit int) *HashcatAdapter {
 	return &HashcatAdapter{wordlist, limit}
 }
 
-func (ha *HashcatAdapter) CrackWPA(file *os.File) (*models.CrackResult, error) {
+func (ha *HashcatAdapter) CrackWPA(file *os.File) ([]*models.Handshake, error) {
 	hashcatCMD := exec.Command("hashcat", "-m2500", "./"+file.Name(), ha.wordList, "--outfile", "result", "--outfile-format", "1,2", "-l", string(ha.limit))
 	var out bytes.Buffer
 	hashcatCMD.Stdout = &out
@@ -31,32 +31,30 @@ func (ha *HashcatAdapter) CrackWPA(file *os.File) (*models.CrackResult, error) {
 	}
 	if status := exitStatus(hashcatCMD.ProcessState); status != 0 && status != 1 {
 		log.Println("Hashcat error")
-		return &models.CrackResult{Status: "Hashcat error"}, errors.New("Hashcat error")
+		return []*models.Handshake{&models.Handshake{Status: "Hashcat error"}}, errors.New("Hashcat error")
 	} else if status == 0 {
 		if strings.Contains(out.String(), "found in potfile") {
-			log.Println("Found in potfile!")
-			result, err := readPotfile(file)
-			if err != nil {
-				return nil, err
-			}
-			return result, nil
-		} else {
-			result, err := readResultFile()
+			log.Println("found in potfile")
+			result, err := ha.readPotfile(file)
 			if err != nil {
 				return nil, err
 			}
 			return result, nil
 		}
-
+		result, err := readResultFile()
+		if err != nil {
+			return nil, err
+		}
+		return result, nil
 	} else {
-		response := models.CrackResult{
+		response := models.Handshake{
 			Status: "Exhausted",
 		}
 		return &response, nil
 	}
 }
 
-func readPotfile(file *os.File) (*models.CrackResult, error) {
+func (ha HashcatAdapter) readPotfile(file *os.File) ([]*models.Handshake, error) {
 	hashcatCMD := exec.Command("hashcat", "-m2500", "./"+file.Name(), "/usr/share/wordlists/rockyou.txt", "--show")
 	var out bytes.Buffer
 	hashcatCMD.Stdout = &out
@@ -65,16 +63,16 @@ func readPotfile(file *os.File) (*models.CrackResult, error) {
 		return nil, err
 	}
 	data := strings.Split(strings.Replace(out.String(), "\n", "", 1), ":")
-	response := models.CrackResult{
+	response := models.Handshake{
 		Password: data[3],
-		Ssid:     data[2],
-		Mac:      data[0],
-		Status:   "Cracked",
+		SSID:     data[2],
+		MAC:      data[0],
+		Status:   "Already cracked",
 	}
 	return &response, nil
 }
 
-func readResultFile() (*models.CrackResult, error) {
+func readResultFile() (*models.Handshake, error) {
 	file, err := os.Open("result")
 	if err != nil {
 		return nil, err
@@ -88,10 +86,10 @@ func readResultFile() (*models.CrackResult, error) {
 	}
 
 	data := strings.Split(strings.Replace(string(content), "\n", "", 1), ":")
-	response := models.CrackResult{
+	response := models.Handshake{
 		Password: data[3],
-		Ssid:     data[2],
-		Mac:      data[0],
+		SSID:     data[2],
+		MAC:      data[0],
 		Status:   "Cracked",
 	}
 	return &response, nil
