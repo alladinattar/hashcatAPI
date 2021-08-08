@@ -23,5 +23,5 @@ type HandshakeRepository interface {
 }
 
 type Cracker interface {
-	CrackWPA(file *os.File) (*Handshake, error)
+	CrackWPA(file *os.File) ([]*Handshake, error)
 }

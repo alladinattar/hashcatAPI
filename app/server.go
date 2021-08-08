@@ -2,12 +2,22 @@ package app
 
 import (
 	"github.com/gorilla/mux"
+	"github.com/hashcatAPI/adapters"
+	"github.com/hashcatAPI/handlers"
+	"github.com/hashcatAPI/repositories"
 	"log"
 	"net/http"
 	"time"
 )
 
-func Run(router *mux.Router) error {
+func Run() error {
+	repo := repositories.NewHandshakeRepository(nil)
+	cracker := adapters.NewHashcat("/usr/share/rockyou.txt", 10000)
+	handler := handlers.NewUploadHandler(repo, cracker)
+	router := mux.NewRouter()
+	router.Handle("/handshakes", nil).Methods("GET")
+	router.Handle("/upload", handler).Methods("POST")
+
 	s := http.Server{
 		Addr:         ":9000",
 		Handler:      router,
