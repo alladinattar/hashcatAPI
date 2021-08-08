@@ -22,7 +22,7 @@ func NewHashcat(wordlist string, limit int) *HashcatAdapter {
 }
 
 func (ha *HashcatAdapter) CrackWPA(file *os.File) ([]*models.Handshake, error) {
-	hashcatCMD := exec.Command("hashcat", "-m2500", "./"+file.Name(), ha.wordList, "--outfile", "result", "--outfile-format", "1,2", "-l", string(ha.limit))
+	hashcatCMD := exec.Command("hashcat", "-m2500", "./"+file.Name(), ha.wordList, "-l", string(ha.limit))
 	var out bytes.Buffer
 	hashcatCMD.Stdout = &out
 	err := hashcatCMD.Run()

@@ -12,7 +12,7 @@ import (
 
 func Run() error {
 	repo := repositories.NewHandshakeRepository(nil)
-	cracker := adapters.NewHashcat("/usr/share/rockyou.txt", 10000)
+	cracker := adapters.NewHashcat("/usr/share/wordlists/rockyou.txt", 10000)
 	handler := handlers.NewUploadHandler(repo, cracker)
 	router := mux.NewRouter()
 	router.Handle("/handshakes", nil).Methods("GET")
