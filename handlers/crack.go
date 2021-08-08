@@ -37,8 +37,7 @@ func (h *CrackHandler) bruteHandshake(w http.ResponseWriter, r *http.Request) {
 		log.Println("crack tool error", err)
 	}
 	if len(handshakes) == 0 {
-		fmt.Println("fsdf")
-		w.Write([]byte("No cracked handshakes"))
+		w.Write([]byte(""))
 		return
 	}
 	result, err := json.MarshalIndent(handshakes, "", "  ")
