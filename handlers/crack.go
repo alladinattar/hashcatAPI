@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/hashcatAPI/models"
 	"io/ioutil"
 	"log"
@@ -39,6 +40,7 @@ func (h *CrackHandler) bruteHandshake(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Println("Failed marshall response", err)
 	}
+	fmt.Println(string(handshakes))
 	w.Write(handshakes)
 	defer os.Remove(file.Name())
 }
