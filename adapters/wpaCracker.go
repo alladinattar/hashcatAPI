@@ -66,7 +66,7 @@ func (ha HashcatAdapter) readPotfile(file *os.File) ([]*models.Handshake, error)
 			MAC:        separatedData[0],
 			Status:     "Cracked",
 			Encryption: "WPA/WPA2",
-			Time:       time.Now().String(),
+			Time:       strconv.Itoa(int(time.Now().Unix())),
 		}
 		crackedHandshakes = append(crackedHandshakes, &response)
 	}
