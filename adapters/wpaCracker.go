@@ -36,6 +36,7 @@ func (ha *HashcatAdapter) CrackWPA(file *os.File) ([]*models.Handshake, error) {
 	} else {
 		crackedShakes, err := ha.readPotfile(file)
 		if err != nil {
+			log.Println("fadsfasdfassdfasd")
 			return nil, err
 		}
 		return crackedShakes, nil
