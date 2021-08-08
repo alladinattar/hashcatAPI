@@ -54,7 +54,8 @@ func (ha HashcatAdapter) readPotfile(file *os.File) ([]*models.Handshake, error)
 	crackedHandshakes := []*models.Handshake{}
 	fmt.Println(string(out.Bytes()))
 	data := strings.Split(out.String(), "\n")
-	for _, line := range data {
+	fmt.Println(data[0])
+	/*for _, line := range data {
 		separatedData := strings.Split(line, ":")
 		response := models.Handshake{
 			Password: separatedData[3],
@@ -63,7 +64,7 @@ func (ha HashcatAdapter) readPotfile(file *os.File) ([]*models.Handshake, error)
 			Status:   "Cracked",
 		}
 		crackedHandshakes = append(crackedHandshakes, &response)
-	}
+	}*/
 
 	return crackedHandshakes, nil
 }
