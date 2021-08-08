@@ -42,6 +42,7 @@ func (h *CrackHandler) bruteHandshake(w http.ResponseWriter, r *http.Request) {
 	}
 	fmt.Println(string(handshakes))
 	if len(handshakes) == 0 {
+		fmt.Println("fsdf")
 		w.Write([]byte("No cracked handshakes"))
 		return
 	}
