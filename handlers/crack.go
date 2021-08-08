@@ -35,11 +35,11 @@ func (h *CrackHandler) bruteHandshake(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Println("crack tool error", err)
 	}
-	response, err := json.MarshalIndent(result, "", "  ")
+	handshakes, err := json.MarshalIndent(result, "", "  ")
 	if err != nil {
 		log.Println("Failed marshall response", err)
 	}
-	w.Write(response)
+	w.Write(handshakes)
 	defer os.Remove(file.Name())
 }
 
