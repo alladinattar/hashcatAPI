@@ -31,7 +31,6 @@ func Run() error {
 	s := http.Server{
 		Addr:         ":9000",
 		Handler:      router,
-		IdleTimeout:  100 * time.Second,
 		WriteTimeout: 100 * time.Second,
 		ReadTimeout:  100 * time.Second,
 	}
