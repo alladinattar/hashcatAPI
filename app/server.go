@@ -18,7 +18,7 @@ func Run() error {
 	statement, _ := db.Prepare("CREATE TABLE IF NOT EXISTS handshakes (id INTEGER PRIMARY KEY, mac TEXT, ssid TEXT, password TEXT, time TEXT, enctyption TEXT)")
 	statement.Exec()
 	repo := repositories.NewHandshakeRepository(db)
-	cracker := adapters.NewHashcat("/usr/share/wordlists/rockyou.txt", 10000)
+	cracker := adapters.NewHashcat("/usr/share/wordlists/rockyou.txt", 14000000)
 	handlerCrack := handlers.NewUploadHandler(repo, cracker)
 	handlerDB := handlers.NewHandshakes(repo)
 	router := mux.NewRouter()
