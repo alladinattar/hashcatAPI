@@ -52,7 +52,8 @@ func (h *CrackHandler) bruteHandshake(w http.ResponseWriter, r *http.Request) {
 	fmt.Println(string(result))
 	_, err = h.handshakeRepo.Save(handshakes)
 	if err != nil {
-		w.WriteHeader(400)
+		log.Println("Failed save handshake", err)
+		w.Write([]byte(err.Error()))
 		return
 	}
 	w.Write(result)
