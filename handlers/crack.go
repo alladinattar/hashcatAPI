@@ -37,6 +37,7 @@ func (h *CrackHandler) bruteHandshake(w http.ResponseWriter, r *http.Request) {
 	handshakes, err := h.wpaCracker.CrackWPA(file)
 	if err != nil {
 		log.Println("crack tool error", err)
+		return
 	}
 	if len(handshakes) == 0 {
 		w.Write([]byte(""))
@@ -46,9 +47,14 @@ func (h *CrackHandler) bruteHandshake(w http.ResponseWriter, r *http.Request) {
 	result, err := json.MarshalIndent(handshakes, "", "  ")
 	if err != nil {
 		log.Println("Failed marshall response", err)
+		return
 	}
 	fmt.Println(string(result))
-
+	_, err = h.handshakeRepo.Save(handshakes)
+	if err != nil {
+		w.WriteHeader(400)
+		return
+	}
 	w.Write(result)
 }
 

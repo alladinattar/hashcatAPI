@@ -1,6 +1,7 @@
 package app
 
 import (
+	"database/sql"
 	"github.com/gorilla/mux"
 	"github.com/hashcatAPI/adapters"
 	"github.com/hashcatAPI/handlers"
@@ -11,11 +12,20 @@ import (
 )
 
 func Run() error {
-	repo := repositories.NewHandshakeRepository(nil)
+	db, err := sql.Open("sqlite3", "./data.db")
+	if err != nil {
+		log.Fatal(err)
+	}
+	statement, _ := db.Prepare("CREATE TABLE IF NOT EXISTS handshakes (id INTEGER PRIMARY KEY, mac TEXT, ssid TEXT, password TEXT, time TEXT, enctyption TEXT)")
+	statement.Exec()
+	repo := repositories.NewHandshakeRepository(db)
 	cracker := adapters.NewHashcat("/usr/share/wordlists/rockyou.txt", 10000)
 	handlerCrack := handlers.NewUploadHandler(repo, cracker)
+	handlerDB := handlers.NewHandshakes(repo)
 	router := mux.NewRouter()
-	router.Handle("/handshakes", nil).Methods("GET")
+
+	router.Handle("/handshakes", handlerDB).Methods("GET")
+	router.Handle("/handshakes", handlerDB).Methods("POST")
 	router.Handle("/upload", handlerCrack).Methods("POST")
 
 	s := http.Server{
@@ -25,7 +35,7 @@ func Run() error {
 		WriteTimeout: 100 * time.Second,
 		ReadTimeout:  100 * time.Second,
 	}
-	err := s.ListenAndServe()
+	err = s.ListenAndServe()
 	if err != nil {
 		log.Fatal(err)
 		return err
