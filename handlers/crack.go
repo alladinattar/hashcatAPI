@@ -31,7 +31,6 @@ func (h *CrackHandler) bruteHandshake(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(400)
 	}
 	defer file.Close()
-	defer os.Remove(file.Name())
 	log.Println("File recieved: ", file.Name())
 	log.Println("Run hashcat with file ", file.Name())
 	handshakes, err := h.wpaCracker.CrackWPA(file)
@@ -40,7 +39,7 @@ func (h *CrackHandler) bruteHandshake(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if len(handshakes) == 0 {
-		w.Write([]byte(""))
+		w.Write([]byte("No cracked handshakes"))
 		log.Println("No cracked handshakes")
 		return
 	}
