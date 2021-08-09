@@ -8,7 +8,6 @@ import (
 	"github.com/hashcatAPI/repositories"
 	"log"
 	"net/http"
-	"time"
 )
 
 func Run() error {
@@ -29,10 +28,8 @@ func Run() error {
 	router.Handle("/upload", handlerCrack).Methods("POST")
 
 	s := http.Server{
-		Addr:         ":9000",
-		Handler:      router,
-		WriteTimeout: 100 * time.Second,
-		ReadTimeout:  100 * time.Second,
+		Addr:    ":9000",
+		Handler: router,
 	}
 	err = s.ListenAndServe()
 	if err != nil {
