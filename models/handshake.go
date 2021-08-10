@@ -1,5 +1,7 @@
 package models
 
+import "os"
+
 type Handshake struct {
 	ID         int     `json:"-"`
 	MAC        string  `json:"mac"`
@@ -10,11 +12,16 @@ type Handshake struct {
 	IMEI       string  `json:"imei"`
 	Time       string  `json:"time"`
 	Password   string  `json:"password"`
+	Status     string  `json:"status"`
 }
 
 type HandshakeRepository interface {
-	Save() (int, error)
+	Save([]*Handshake) (int, error)
 	GetByID(ID int) (*Handshake, error)
-	GetByMAC(MAC string) (*Handshake, error)
-	GetHandshakes() ([]*Handshake, error)
+	GetByMAC(MAC string) ([]*Handshake, error)
+	GetAll() ([]*Handshake, error)
+}
+
+type Cracker interface {
+	CrackWPA(file *os.File) ([]*Handshake, error)
 }
