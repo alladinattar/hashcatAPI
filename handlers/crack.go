@@ -62,7 +62,7 @@ func (h *CrackHandler) bruteHandshake(w http.ResponseWriter, r *http.Request) {
 	log.Println(string(result))
 	var saved int
 	for _, handshake := range handshakes {
-		check, err := h.CheckHandshakeInDB(handshake)
+		check, err := h.checkHandshakeInDB(handshake)
 		if err != nil {
 			log.Println("Failed check handshake")
 			handshake.Status = "Failed check"
@@ -118,7 +118,7 @@ func (h *CrackHandler) receiveFile(r *http.Request) (*os.File, error) {
 	return uploadedFile, nil
 }
 
-func (h *CrackHandler) CheckHandshakeInDB(handshake *models.Handshake) (bool, error) {
+func (h *CrackHandler) checkHandshakeInDB(handshake *models.Handshake) (bool, error) {
 	if handshake.SSID == "" || handshake.Password == "" || handshake.MAC == "" || handshake.Latitude == "" || handshake.Longitude == "" || handshake.IMEI == "" {
 		return false, nil
 	} else {

@@ -22,22 +22,32 @@ func NewHashcat(wordlist string, limit int) *HashcatAdapter {
 	return &HashcatAdapter{wordlist, limit}
 }
 
-func (ha *HashcatAdapter) CrackWPA(file *os.File) ([]*models.Handshake, error) {
+func (ha *HashcatAdapter) CrackWPA(file *os.File) (crackedHandshakes []*models.Handshake, err error) {
 	hashcatCMD := exec.Command("hashcat", "-m2500", file.Name(), ha.wordList, "-l", strconv.Itoa(ha.limit))
 	var out bytes.Buffer
 	hashcatCMD.Stdout = &out
 	hashcatCMD.Run()
-
-	if status := exitStatus(hashcatCMD.ProcessState); status != 0 && status != 1 {
-		log.Fatal("Hashcat error", status)
-		return []*models.Handshake{{Status: "Hashcat error"}}, errors.New("Hashcat error")
-	} else {
-		crackedShakes, err := ha.readPotfile(file)
+	status := exitStatus(hashcatCMD.ProcessState)
+	if status == 0 {
+		crackedHandshakes, err = ha.readPotfile(file)
 		if err != nil {
 			return nil, err
 		}
-		return crackedShakes, nil
+	} else if status == 1 {
+		crackedHandshakes, err = ha.readPotfile(file)
+		if err != nil {
+			return nil, err
+		}
+		err = os.Remove(file.Name())
+		if err != nil {
+			log.Println("Failed when remove received file", err)
+			return nil, err
+		}
+	} else {
+		log.Fatal("Hashcat error", status)
+		return []*models.Handshake{{Status: "Hashcat error"}}, errors.New("Hashcat error")
 	}
+	return crackedHandshakes, nil
 }
 
 func (ha HashcatAdapter) readPotfile(file *os.File) (crackedHandshakes []*models.Handshake, err error) {
