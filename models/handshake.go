@@ -12,6 +12,7 @@ type Handshake struct {
 	IMEI       string `json:"imei"`
 	Time       string `json:"time"`
 	Password   string `json:"password"`
+	Status     string `json:"status,omitempty"`
 }
 
 type HandshakeRepository interface {
