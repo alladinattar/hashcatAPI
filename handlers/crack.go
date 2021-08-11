@@ -8,6 +8,8 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strconv"
+	"time"
 )
 
 type CrackHandler struct {
@@ -50,6 +52,7 @@ func (h *CrackHandler) bruteHandshake(w http.ResponseWriter, r *http.Request) {
 		handshake.Latitude = latitude
 		handshake.Longitude = longitude
 		handshake.IMEI = imei
+		handshake.Time = strconv.Itoa(int(time.Now().Unix()))
 	}
 	result, err := json.MarshalIndent(handshakes, "", "  ")
 	if err != nil {
@@ -81,7 +84,7 @@ func (h *CrackHandler) receiveFile(r *http.Request) (*os.File, error) {
 	}
 	defer file.Close()
 
-	fileName := fmt.Sprintf("./tempHandshakes/shake-%s-%s-%s", imei, longitude, latitude)
+	fileName := fmt.Sprintf("./tempHandshakes/shake-%s-%s-%s-%s", imei, longitude, latitude, strconv.Itoa(int(time.Now().Unix())))
 	uploadedFile, err := os.Create(fileName)
 	if err != nil {
 		return nil, err
