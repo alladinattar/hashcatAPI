@@ -75,7 +75,7 @@ func (h *CrackHandler) bruteHandshake(w http.ResponseWriter, r *http.Request) {
 			continue
 		} else {
 			log.Println("Invalid handshake. Incomplete device information received")
-			handshake.Status = "Invalid handshake. Incomplete device information received"
+			handshake.Status = "Invalid handshake. Incomplete device information received or already exists in database"
 			continue
 		}
 	}
