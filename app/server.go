@@ -15,7 +15,8 @@ func Run() error {
 	if err != nil {
 		log.Fatal(err)
 	}
-	statement, _ := db.Prepare("CREATE TABLE IF NOT EXISTS handshakes (id INTEGER PRIMARY KEY, mac TEXT, ssid TEXT, password TEXT, time TEXT, enctyption TEXT, longitude TEXT, latitude TEXT, imei TEXT)")
+	statement, _ := db.Prepare("CREATE TABLE IF NOT EXISTS handshakes (id INTEGER PRIMARY KEY, mac TEXT, ssid TEXT, " +
+		"password TEXT, time TEXT, enctyption TEXT, longitude TEXT, latitude TEXT, imei TEXT)")
 	statement.Exec()
 	repo := repositories.NewHandshakeRepository(db)
 	cracker := adapters.NewHashcat("/usr/share/wordlists/rockyou.txt", 14000000)

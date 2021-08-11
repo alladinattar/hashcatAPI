@@ -84,7 +84,7 @@ func (h *CrackHandler) bruteHandshake(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte(err.Error()))
 		return
 	}
-	total := fmt.Sprintf("Saved: %s\nDiscarded: %s", saved, len(handshakes)-saved)
+	total := fmt.Sprintf("Saved: %s\nDiscarded: %s", strconv.Itoa(saved), strconv.Itoa(len(handshakes)-saved))
 	w.Write(result)
 	w.Write([]byte(total))
 }
