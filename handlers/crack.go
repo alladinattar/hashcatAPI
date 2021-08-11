@@ -74,7 +74,7 @@ func (h *CrackHandler) receiveFile(r *http.Request) (*os.File, error) {
 	defer file.Close()
 
 	fileName := fmt.Sprintf("./tempHandshakes/shake-%s-%s-%s", imei, longitude, latitude)
-	uploadedFile, err := os.Open(fileName)
+	uploadedFile, err := os.Create(fileName)
 	if err != nil {
 		return nil, err
 	}
