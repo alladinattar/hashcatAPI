@@ -25,17 +25,17 @@ func (h *CrackHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *CrackHandler) bruteHandshake(w http.ResponseWriter, r *http.Request) {
-	file, err := receiveFile(r)
+	file, err := h.receiveFile(r)
 	if err != nil {
 		log.Println(err)
 		w.WriteHeader(400)
+		w.Write([]byte("Failed receive file"))
 	}
 	defer file.Close()
-	log.Println("File recieved: ", file.Name())
 	log.Println("Run hashcat with file ", file.Name())
 	handshakes, err := h.wpaCracker.CrackWPA(file)
 	if err != nil {
-		log.Println("crack tool error", err)
+		log.Println("Crack tool error", err)
 		return
 	}
 	if len(handshakes) == 0 {
@@ -48,7 +48,7 @@ func (h *CrackHandler) bruteHandshake(w http.ResponseWriter, r *http.Request) {
 		log.Println("Failed marshall response", err)
 		return
 	}
-	fmt.Println(string(result))
+	log.Println(string(result))
 	_, err = h.handshakeRepo.Save(handshakes)
 	if err != nil {
 		log.Println("Failed save handshake", err)
@@ -58,7 +58,11 @@ func (h *CrackHandler) bruteHandshake(w http.ResponseWriter, r *http.Request) {
 	w.Write(result)
 }
 
-func receiveFile(r *http.Request) (*os.File, error) {
+func (h *CrackHandler) receiveFile(r *http.Request) (*os.File, error) {
+	longitude := r.Header.Get("lon")
+	latitude := r.Header.Get("lat")
+	imei := r.Header.Get("imei")
+
 	err := r.ParseMultipartForm(10 << 20)
 	if err != nil {
 		return nil, err
@@ -68,7 +72,9 @@ func receiveFile(r *http.Request) (*os.File, error) {
 		return nil, err
 	}
 	defer file.Close()
-	uploadedFile, err := ioutil.TempFile("./tempHandshakes", "shake-*.hccapx")
+
+	fileName := fmt.Sprintf("./tempHandshakes/shake-%s-%s-%s", imei, longitude, latitude)
+	uploadedFile, err := os.Open(fileName)
 	if err != nil {
 		return nil, err
 	}

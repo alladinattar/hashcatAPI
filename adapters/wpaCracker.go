@@ -3,7 +3,6 @@ package adapters
 import (
 	"bytes"
 	"errors"
-	"fmt"
 	"github.com/hashcatAPI/models"
 	"log"
 	"os"
@@ -53,7 +52,7 @@ func (ha HashcatAdapter) readPotfile(file *os.File) ([]*models.Handshake, error)
 		return []*models.Handshake{}, nil
 	}
 	crackedHandshakes := []*models.Handshake{}
-	fmt.Println(string(out.Bytes()))
+	log.Println(string(out.Bytes()))
 	data := strings.Split(out.String(), "\n")
 	for _, line := range data {
 		if line == "" {

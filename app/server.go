@@ -25,7 +25,7 @@ func Run() error {
 
 	router.Handle("/handshakes", handlerDB).Methods("GET")
 	router.Handle("/handshakes", handlerDB).Methods("POST")
-	router.Handle("/upload", handlerCrack).Methods("POST")
+	router.Handle("/crack", handlerCrack).Methods("POST")
 
 	s := http.Server{
 		Addr:    ":9000",

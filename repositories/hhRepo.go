@@ -3,6 +3,7 @@ package repositories
 import (
 	"database/sql"
 	"errors"
+	"fmt"
 	"github.com/hashcatAPI/models"
 	_ "github.com/mattn/go-sqlite3" //for sqlite database
 	"log"
@@ -44,7 +45,8 @@ func (r *HandshakeRepository) GetAll() (handshakes []*models.Handshake, err erro
 func (r *HandshakeRepository) Save(handshakes []*models.Handshake) (int, error) {
 	originalHandshakes, repeatedHandshakes := r.checkHandshakes(handshakes)
 	if len(repeatedHandshakes) != 0 {
-		return 0, errors.New("These handshakes already exists: " + strings.Join(repeatedHandshakes, ",") + ". Others added successfully")
+		error := fmt.Sprintf("Already exists: %s\n Added: %s", strings.Join(repeatedHandshakes, ","), strings.Join(originalHandshakes, ","))
+		return 0, errors.New(error)
 	}
 	for _, handshake := range originalHandshakes {
 		stmt, err := r.db.Prepare("INSERT INTO handshakes(mac , ssid , password, time,enctyption) values(?,?,?,?,?)")
@@ -79,9 +81,9 @@ func (r *HandshakeRepository) GetByMAC(MAC string) (handshakes []*models.Handsha
 	return handshakes, nil
 }
 
-func (r *HandshakeRepository) checkHandshakes(handshakes []*models.Handshake) (originalHandshakes []*models.Handshake, repeatedHandshakes []string) {
+func (r *HandshakeRepository) checkHandshakes(handshakes []*models.Handshake) (originalHandshakes []string, repeatedHandshakes []string) {
 	for _, handshake := range handshakes {
-		if handshake.SSID == "" || handshake.Password == "" || handshake.MAC == "" {
+		if handshake.SSID == "" || handshake.Password == "" || handshake.MAC == "" || handshake.Latitude == 0 || handshake.Longitude == 0 || handshake.IMEI == "" {
 			continue
 		}
 		handshakes, err := r.GetByMAC(handshake.MAC)
@@ -92,7 +94,7 @@ func (r *HandshakeRepository) checkHandshakes(handshakes []*models.Handshake) (o
 			repeatedHandshakes = append(repeatedHandshakes, handshake.MAC)
 			continue
 		}
-		originalHandshakes = append(originalHandshakes, handshake)
+		originalHandshakes = append(originalHandshakes, handshake.MAC)
 	}
 	return originalHandshakes, repeatedHandshakes
 }
