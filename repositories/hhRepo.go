@@ -44,8 +44,12 @@ func (r *HandshakeRepository) GetAll() (handshakes []*models.Handshake, err erro
 
 func (r *HandshakeRepository) Save(handshakes []*models.Handshake) (int, error) {
 	originalHandshakes, repeatedHandshakes := r.checkHandshakes(handshakes)
+	originalHandshakesString := ""
+	for _, handshake := range originalHandshakes {
+		originalHandshakesString += handshake.MAC
+	}
 	if len(repeatedHandshakes) != 0 {
-		error := fmt.Sprintf("Already exists: %s\n Added: %s", strings.Join(repeatedHandshakes, ","), strings.Join(originalHandshakes, ","))
+		error := fmt.Sprintf("Already exists: %s\n Added: %s", strings.Join(repeatedHandshakes, ","), originalHandshakesString)
 		return 0, errors.New(error)
 	}
 	for _, handshake := range originalHandshakes {
@@ -81,7 +85,7 @@ func (r *HandshakeRepository) GetByMAC(MAC string) (handshakes []*models.Handsha
 	return handshakes, nil
 }
 
-func (r *HandshakeRepository) checkHandshakes(handshakes []*models.Handshake) (originalHandshakes []string, repeatedHandshakes []string) {
+func (r *HandshakeRepository) checkHandshakes(handshakes []*models.Handshake) (originalHandshakes []*models.Handshake, repeatedHandshakes []string) {
 	for _, handshake := range handshakes {
 		if handshake.SSID == "" || handshake.Password == "" || handshake.MAC == "" || handshake.Latitude == 0 || handshake.Longitude == 0 || handshake.IMEI == "" {
 			continue
@@ -94,7 +98,7 @@ func (r *HandshakeRepository) checkHandshakes(handshakes []*models.Handshake) (o
 			repeatedHandshakes = append(repeatedHandshakes, handshake.MAC)
 			continue
 		}
-		originalHandshakes = append(originalHandshakes, handshake.MAC)
+		originalHandshakes = append(originalHandshakes, handshake)
 	}
 	return originalHandshakes, repeatedHandshakes
 }
