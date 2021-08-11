@@ -31,8 +31,8 @@ func (r *HandshakeRepository) GetAll() (handshakes []*models.Handshake, err erro
 	}
 	for rows.Next() {
 		handshake := &models.Handshake{}
-		err = rows.Scan(&handshake.ID, &handshake.MAC, &handshake.SSID, &handshake.Encryption,
-			/*&handshake.Latitude, &handshake.Longitude, &handshake.IMEI,*/ &handshake.Time, &handshake.Password)
+		err = rows.Scan(&handshake.ID, &handshake.MAC, &handshake.SSID, &handshake.Password, &handshake.Time,
+			&handshake.Encryption, &handshake.Longitude, &handshake.Latitude, &handshake.IMEI)
 		if err != nil {
 			log.Println(err)
 		}
