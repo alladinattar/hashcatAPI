@@ -16,7 +16,7 @@ type Handshake struct {
 }
 
 type HandshakeRepository interface {
-	Save([]*Handshake) (int, error)
+	Save(*Handshake) (int, error)
 	GetByID(ID int) (*Handshake, error)
 	GetByMAC(MAC string) ([]*Handshake, error)
 	GetAll() ([]*Handshake, error)

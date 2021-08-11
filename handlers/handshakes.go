@@ -38,34 +38,7 @@ func (h *HandshakesHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		}
 		w.Write(result)
 		return
-	case "POST":
-		log.Println("Save handshake")
-		var resp Response
-		var handshakes []*models.Handshake
-		json.NewDecoder(r.Body).Decode(&handshakes)
-		defer r.Body.Close()
-		err := h.saveHandshake(handshakes)
-		if err != nil {
-			log.Println("Cannot save new handshake", err)
-			resp.Result = "Cannot save new handshake"
-			resp.Comment = err.Error()
-			err := json.NewEncoder(w).Encode(resp)
-			if err != nil {
-				w.WriteHeader(400)
-				return
-			}
-			return
-		}
-		resp.Result = "Success added all handshakes"
-		w.WriteHeader(201)
-		err = json.NewEncoder(w).Encode(resp)
-		if err != nil {
-			w.WriteHeader(400)
-			return
-		}
-
 	}
-
 }
 
 func (h *HandshakesHandler) getHandshakes() ([]*models.Handshake, error) {
@@ -74,12 +47,4 @@ func (h *HandshakesHandler) getHandshakes() ([]*models.Handshake, error) {
 		return nil, err
 	}
 	return handshakes, nil
-}
-
-func (h *HandshakesHandler) saveHandshake(handshakes []*models.Handshake) error {
-	_, err := h.handshakeRepo.Save(handshakes)
-	if err != nil {
-		return err
-	}
-	return nil
 }

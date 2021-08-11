@@ -2,12 +2,9 @@ package repositories
 
 import (
 	"database/sql"
-	"errors"
-	"fmt"
 	"github.com/hashcatAPI/models"
 	_ "github.com/mattn/go-sqlite3" //for sqlite database
 	"log"
-	"strings"
 )
 
 type HandshakeRepository struct {
@@ -42,30 +39,25 @@ func (r *HandshakeRepository) GetAll() (handshakes []*models.Handshake, err erro
 	return handshakes, err
 }
 
-func (r *HandshakeRepository) Save(handshakes []*models.Handshake) (int, error) {
-	originalHandshakes, repeatedHandshakes := r.checkHandshakes(handshakes)
-	originalHandshakesString := ""
-	for _, handshake := range originalHandshakes {
-		originalHandshakesString += handshake.MAC
+func (r *HandshakeRepository) Save(handshake *models.Handshake) (int, error) {
+	affectedRows := 0
+	stmt, err := r.db.Prepare("INSERT INTO handshakes(mac , ssid , password, time,enctyption, longitude, latitude, imei) values(?,?,?,?,?,?,?,?)")
+	if err != nil {
+		log.Println("Failed prepare insert query", err)
+		return 0, nil
 	}
-	if len(repeatedHandshakes) != 0 {
-		error := fmt.Sprintf("Already exists: %s\n Added: %s", strings.Join(repeatedHandshakes, ","), originalHandshakesString)
-		return 0, errors.New(error)
-	}
-	for _, handshake := range originalHandshakes {
-		stmt, err := r.db.Prepare("INSERT INTO handshakes(mac , ssid , password, time,enctyption, longitude, latitude, imei) values(?,?,?,?,?,?,?,?)")
-		if err != nil {
-			log.Println("Failed prepare insert query", err)
-			return 1, err
-		}
-		_, err = stmt.Exec(handshake.MAC, handshake.SSID, handshake.Password, handshake.Time, handshake.Encryption, handshake.Longitude, handshake.Latitude, handshake.IMEI)
-		if err != nil {
-			log.Println("Failed exec insert query", err)
-			return 1, err
-		}
 
+	result, err := stmt.Exec(handshake.MAC, handshake.SSID, handshake.Password, handshake.Time, handshake.Encryption, handshake.Longitude, handshake.Latitude, handshake.IMEI)
+	if err != nil {
+		log.Println("Failed exec insert query", err)
+		return 0, nil
 	}
-	return len(originalHandshakes), nil
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		log.Println("Failed get rows affected", err)
+	}
+	affectedRows += int(rowsAffected)
+	return affectedRows, nil
 }
 
 func (r *HandshakeRepository) GetByMAC(MAC string) (handshakes []*models.Handshake, err error) {
@@ -83,22 +75,4 @@ func (r *HandshakeRepository) GetByMAC(MAC string) (handshakes []*models.Handsha
 	}
 	rows.Close()
 	return handshakes, nil
-}
-
-func (r *HandshakeRepository) checkHandshakes(handshakes []*models.Handshake) (originalHandshakes []*models.Handshake, repeatedHandshakes []string) {
-	for _, handshake := range handshakes {
-		if handshake.SSID == "" || handshake.Password == "" || handshake.MAC == "" || handshake.Latitude == "" || handshake.Longitude == "" || handshake.IMEI == "" {
-			continue
-		}
-		handshakes, err := r.GetByMAC(handshake.MAC)
-		if err != nil {
-			return nil, repeatedHandshakes
-		}
-		if len(handshakes) != 0 {
-			repeatedHandshakes = append(repeatedHandshakes, handshake.MAC)
-			continue
-		}
-		originalHandshakes = append(originalHandshakes, handshake)
-	}
-	return originalHandshakes, repeatedHandshakes
 }

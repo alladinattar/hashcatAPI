@@ -60,13 +60,33 @@ func (h *CrackHandler) bruteHandshake(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	log.Println(string(result))
-	_, err = h.handshakeRepo.Save(handshakes)
+	var saved int
+	for _, handshake := range handshakes {
+		check, err := h.CheckHandshakeInDB(handshake)
+		if err != nil {
+			log.Println("Failed check handshake")
+			handshake.Status = "Failed check"
+			continue
+		}
+		if check {
+			_, err = h.handshakeRepo.Save(handshake)
+			saved += 1
+			handshake.Status = "Saved"
+			continue
+		} else {
+			log.Println("Invalid handshake. Incomplete device information received")
+			handshake.Status = "Invalid handshake. Incomplete device information received"
+			continue
+		}
+	}
 	if err != nil {
 		log.Println("Failed save handshake", err)
 		w.Write([]byte(err.Error()))
 		return
 	}
+	total := fmt.Sprintf("Saved: %s\nDiscarded: %s", saved, len(handshakes)-saved)
 	w.Write(result)
+	w.Write([]byte(total))
 }
 
 func (h *CrackHandler) receiveFile(r *http.Request) (*os.File, error) {
@@ -96,4 +116,21 @@ func (h *CrackHandler) receiveFile(r *http.Request) (*os.File, error) {
 
 	uploadedFile.Write(fileBytes)
 	return uploadedFile, nil
+}
+
+func (h *CrackHandler) CheckHandshakeInDB(handshake *models.Handshake) (bool, error) {
+	if handshake.SSID == "" || handshake.Password == "" || handshake.MAC == "" || handshake.Latitude == "" || handshake.Longitude == "" || handshake.IMEI == "" {
+		return false, nil
+	} else {
+		handshakes, err := h.handshakeRepo.GetByMAC(handshake.MAC)
+		if err != nil {
+			log.Println(err)
+			return false, err
+		}
+		if len(handshakes) != 0 {
+			log.Println("Handshake ", handshake.MAC, "found in db")
+			return false, nil
+		}
+	}
+	return true, nil
 }
