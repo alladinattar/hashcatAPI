@@ -43,6 +43,14 @@ func (h *CrackHandler) bruteHandshake(w http.ResponseWriter, r *http.Request) {
 		log.Println("No cracked handshakes")
 		return
 	}
+	longitude := r.Header.Get("lon")
+	latitude := r.Header.Get("lat")
+	imei := r.Header.Get("imei")
+	for _, handshake := range handshakes {
+		handshake.Latitude = latitude
+		handshake.Longitude = longitude
+		handshake.IMEI = imei
+	}
 	result, err := json.MarshalIndent(handshakes, "", "  ")
 	if err != nil {
 		log.Println("Failed marshall response", err)

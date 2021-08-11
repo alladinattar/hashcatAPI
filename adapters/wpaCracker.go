@@ -29,7 +29,7 @@ func (ha *HashcatAdapter) CrackWPA(file *os.File) ([]*models.Handshake, error) {
 	hashcatCMD.Run()
 
 	if status := exitStatus(hashcatCMD.ProcessState); status != 0 && status != 1 {
-		log.Println("Hashcat error")
+		log.Fatal("Hashcat error", status)
 		return []*models.Handshake{{Status: "Hashcat error"}}, errors.New("Hashcat error")
 	} else {
 		crackedShakes, err := ha.readPotfile(file)
@@ -40,18 +40,17 @@ func (ha *HashcatAdapter) CrackWPA(file *os.File) ([]*models.Handshake, error) {
 	}
 }
 
-func (ha HashcatAdapter) readPotfile(file *os.File) ([]*models.Handshake, error) {
-	hashcatCMD := exec.Command("hashcat", "-m2500", "./"+file.Name(), "/usr/share/wordlists/rockyou.txt", "--show")
+func (ha HashcatAdapter) readPotfile(file *os.File) (crackedHandshakes []*models.Handshake, err error) {
+	hashcatCMD := exec.Command("hashcat", "-m2500", "./"+file.Name(), ha.wordList, "--show")
 	var out bytes.Buffer
 	hashcatCMD.Stdout = &out
-	err := hashcatCMD.Run()
+	err = hashcatCMD.Run()
 	if err != nil {
 		return nil, err
 	}
 	if out.String() == "" {
 		return []*models.Handshake{}, nil
 	}
-	crackedHandshakes := []*models.Handshake{}
 	log.Println(string(out.Bytes()))
 	data := strings.Split(out.String(), "\n")
 	for _, line := range data {

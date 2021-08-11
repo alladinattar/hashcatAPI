@@ -53,12 +53,12 @@ func (r *HandshakeRepository) Save(handshakes []*models.Handshake) (int, error) 
 		return 0, errors.New(error)
 	}
 	for _, handshake := range originalHandshakes {
-		stmt, err := r.db.Prepare("INSERT INTO handshakes(mac , ssid , password, time,enctyption) values(?,?,?,?,?)")
+		stmt, err := r.db.Prepare("INSERT INTO handshakes(mac , ssid , password, time,enctyption, longitude, latitude, imei) values(?,?,?,?,?,?,?,?)")
 		if err != nil {
 			log.Println("Failed prepare insert query", err)
 			return 1, err
 		}
-		_, err = stmt.Exec(handshake.MAC, handshake.SSID, handshake.Password, handshake.Time, handshake.Encryption)
+		_, err = stmt.Exec(handshake.MAC, handshake.SSID, handshake.Password, handshake.Time, handshake.Encryption, handshake.Longitude, handshake.Latitude, handshake.IMEI)
 		if err != nil {
 			log.Println("Failed exec insert query", err)
 			return 1, err
@@ -87,7 +87,7 @@ func (r *HandshakeRepository) GetByMAC(MAC string) (handshakes []*models.Handsha
 
 func (r *HandshakeRepository) checkHandshakes(handshakes []*models.Handshake) (originalHandshakes []*models.Handshake, repeatedHandshakes []string) {
 	for _, handshake := range handshakes {
-		if handshake.SSID == "" || handshake.Password == "" || handshake.MAC == "" || handshake.Latitude == 0 || handshake.Longitude == 0 || handshake.IMEI == "" {
+		if handshake.SSID == "" || handshake.Password == "" || handshake.MAC == "" || handshake.Latitude == "" || handshake.Longitude == "" || handshake.IMEI == "" {
 			continue
 		}
 		handshakes, err := r.GetByMAC(handshake.MAC)

@@ -3,16 +3,16 @@ package models
 import "os"
 
 type Handshake struct {
-	ID         int     `json:"-"`
-	MAC        string  `json:"mac"`
-	SSID       string  `json:"ssid"`
-	Encryption string  `json:"encryption"`
-	Latitude   float64 `json:"latitude"`
-	Longitude  float64 `json:"longitude"`
-	IMEI       string  `json:"imei"`
-	Time       string  `json:"time"`
-	Password   string  `json:"password"`
-	Status     string  `json:"status"`
+	ID         int    `json:"-"`
+	MAC        string `json:"mac"`
+	SSID       string `json:"ssid"`
+	Encryption string `json:"encryption"`
+	Latitude   string `json:"latitude"`
+	Longitude  string `json:"longitude"`
+	IMEI       string `json:"imei"`
+	Time       string `json:"time"`
+	Password   string `json:"password"`
+	Status     string `json:"status"`
 }
 
 type HandshakeRepository interface {
