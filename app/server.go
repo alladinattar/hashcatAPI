@@ -19,7 +19,7 @@ func Run() error {
 		"password TEXT, time TEXT, enctyption TEXT, longitude TEXT, latitude TEXT, imei TEXT)")
 	statement.Exec()
 	repo := repositories.NewHandshakeRepository(db)
-	cracker := adapters.NewHashcat("/usr/share/wordlists/rockyou.txt", 14000000)
+	cracker := adapters.NewHashcat("/usr/share/wordlists/rockyou.txt", 14000)
 	handlerCrack := handlers.NewUploadHandler(repo, cracker)
 	handlerDB := handlers.NewHandshakes(repo)
 	router := mux.NewRouter()

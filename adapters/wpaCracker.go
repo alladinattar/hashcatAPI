@@ -33,14 +33,14 @@ func (ha *HashcatAdapter) CrackWPA(file *os.File) (crackedHandshakes []*models.H
 		if err != nil {
 			return nil, err
 		}
-	} else if status == 1 {
-		crackedHandshakes, err = ha.readPotfile(file)
-		if err != nil {
-			return nil, err
-		}
 		err = os.Remove(file.Name())
 		if err != nil {
 			log.Println("Failed when remove received file", err)
+			return nil, err
+		}
+	} else if status == 1 {
+		crackedHandshakes, err = ha.readPotfile(file)
+		if err != nil {
 			return nil, err
 		}
 	} else {
