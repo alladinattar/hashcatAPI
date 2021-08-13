@@ -5,3 +5,10 @@
 ![Alt text](./imgs/hashcat.png)
 ### API
 ![Alt text](./imgs/api.png)
+## Software requirements
+- Hashcat
+## Usage
+```
+./hashcatAPI
+```
+
