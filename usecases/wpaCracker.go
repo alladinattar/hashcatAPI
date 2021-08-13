@@ -1,4 +1,4 @@
-package adapters
+package usecases
 
 import (
 	"bytes"
@@ -77,7 +77,6 @@ func (ha HashcatAdapter) readPotfile(file *os.File) (crackedHandshakes []*models
 		}
 		crackedHandshakes = append(crackedHandshakes, &response)
 	}
-
 	return crackedHandshakes, nil
 }
 
