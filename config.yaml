@@ -1,0 +1,6 @@
+# Server configurations
+server:
+  port: 9000
+hashcat:
+  wordlist: "/usr/share/wordlists/rockyou.txt"
+  limit: 10000
