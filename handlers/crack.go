@@ -119,7 +119,7 @@ func (h *CrackHandler) receiveFile(r *http.Request) (*os.File, error) {
 }
 
 func (h *CrackHandler) checkHandshakeInDB(handshake *models.Handshake) (bool, error) {
-	if handshake.SSID == "" || handshake.Password == "" || handshake.MAC == "" || handshake.Latitude == "" || handshake.Longitude == "" || handshake.IMEI == "" {
+	if handshake.SSID == "" || handshake.Password == "" || handshake.MAC == ""  || handshake.IMEI == "" {
 		return false, nil
 	} else {
 		handshakes, err := h.handshakeRepo.GetByMAC(handshake.MAC)
