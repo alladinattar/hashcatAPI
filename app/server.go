@@ -2,12 +2,14 @@ package app
 
 import (
 	"database/sql"
+	"github.com/hashcatAPI/queue"
+	"github.com/streadway/amqp"
+	"log"
+	"net/http"
+
 	"github.com/gorilla/mux"
 	"github.com/hashcatAPI/handlers"
 	"github.com/hashcatAPI/repositories"
-	"github.com/hashcatAPI/usecases"
-	"log"
-	"net/http"
 )
 
 
@@ -20,18 +22,30 @@ func Run() error {
 	if err != nil {
 		log.Fatal(err)
 	}
-	statement, _ := db.Prepare("CREATE TABLE IF NOT EXISTS handshakes (id INTEGER PRIMARY KEY, mac TEXT, ssid TEXT, " +
-		"password TEXT, time TEXT, enctyption TEXT, longitude TEXT, latitude TEXT, imei TEXT)")
-	statement.Exec()
+
+	DBSetup(db)
+	//RabbitMQ connection
+	conn, err := amqp.Dial("amqp://guest:guest@localhost:5672/")
+	if err!=nil{
+		log.Fatal("Failed connect to task queue", err)
+	}
+	defer conn.Close()
+	ch, err := conn.Channel()
+	if err!=nil{
+		log.Fatal("Failed create channel queue", err)
+	}
+	defer ch.Close()
+
+	queueRepo := queue.NewQueue(ch)
+
 	repo := repositories.NewHandshakeRepository(db)
-	cracker := usecases.NewHashcat(cfg.Hashcat.Wordlist, cfg.Hashcat.Limit)
-	handlerCrack := handlers.NewUploadHandler(repo, cracker)
 	handlerDB := handlers.NewHandshakes(repo)
+	queueHandler := handlers.NewQueueHandler(repo, queueRepo)
 	router := mux.NewRouter()
 
 	router.Handle("/handshakes", handlerDB).Methods("GET")
-	router.Handle("/handshakes", handlerDB).Methods("POST")
-	router.Handle("/crack", handlerCrack).Methods("POST")
+	router.Handle("/result", handlerDB).Methods("GET")
+	router.Handle("/task", queueHandler).Methods("POST")
 
 	s := http.Server{
 		Addr:    ":" + cfg.Server.Port,

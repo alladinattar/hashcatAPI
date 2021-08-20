@@ -25,3 +25,7 @@ type HandshakeRepository interface {
 type Cracker interface {
 	CrackWPA(file *os.File) ([]*Handshake, error)
 }
+
+type TasksQueue interface {
+	AddTask(string)error
+}
