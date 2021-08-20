@@ -28,15 +28,15 @@ func (queue *QueueRepo) AddTask(task string)error{
 		return err
 	}
 
-	body := task
 	err = queue.Ch.Publish(
 		"",     // exchange
 		q.Name, // routing key
 		false,  // mandatory
 		false,  // immediate
 		amqp.Publishing {
+			DeliveryMode: amqp.Persistent,
 			ContentType: "text/plain",
-			Body:        []byte(body),
+			Body:        []byte(task),
 		})
 	if err!=nil{
 		log.Println("Failed add new task", err)

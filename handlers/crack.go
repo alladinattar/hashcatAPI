@@ -89,35 +89,6 @@ func (h *CrackHandler) bruteHandshake(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte(total))
 }
 
-func (h *CrackHandler) receiveFile(r *http.Request) (*os.File, error) {
-	longitude := r.Header.Get("lon")
-	latitude := r.Header.Get("lat")
-	imei := r.Header.Get("imei")
-
-	err := r.ParseMultipartForm(10 << 20)
-	if err != nil {
-		return nil, err
-	}
-	file, _, err := r.FormFile("file")
-	if err != nil {
-		return nil, err
-	}
-	defer file.Close()
-
-	fileName := fmt.Sprintf("./tempHandshakes/shake-%s-%s-%s-%s", imei, longitude, latitude, strconv.Itoa(int(time.Now().Unix())))
-	uploadedFile, err := os.Create(fileName)
-	if err != nil {
-		return nil, err
-	}
-	fileBytes, err := ioutil.ReadAll(file)
-	if err != nil {
-		return nil, err
-	}
-
-	uploadedFile.Write(fileBytes)
-	return uploadedFile, nil
-}
-
 func (h *CrackHandler) checkHandshakeInDB(handshake *models.Handshake) (bool, error) {
 	if handshake.SSID == "" || handshake.Password == "" || handshake.MAC == ""  || handshake.IMEI == "" {
 		return false, nil

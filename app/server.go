@@ -51,10 +51,13 @@ func Run() error {
 		Addr:    ":" + cfg.Server.Port,
 		Handler: router,
 	}
+
+	go queue.StartConsumeTasks()
 	err = s.ListenAndServe()
 	if err != nil {
 		log.Fatal(err)
 		return err
 	}
+
 	return nil
 }
