@@ -10,7 +10,6 @@ import (
 	"strconv"
 	"strings"
 	"syscall"
-	"time"
 )
 
 type HashcatAdapter struct {
@@ -73,7 +72,6 @@ func (ha HashcatAdapter) readPotfile(file *os.File) (crackedHandshakes []*models
 			SSID:       separatedData[2],
 			MAC:        separatedData[0],
 			Encryption: "WPA/WPA2",
-			Time:       strconv.Itoa(int(time.Now().Unix())),
 		}
 		crackedHandshakes = append(crackedHandshakes, &response)
 	}

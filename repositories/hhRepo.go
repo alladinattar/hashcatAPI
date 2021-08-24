@@ -76,3 +76,79 @@ func (r *HandshakeRepository) GetByMAC(MAC string) (handshakes []*models.Handsha
 	rows.Close()
 	return handshakes, nil
 }
+
+func (r *HandshakeRepository) AddTaskToDB(task *models.Handshake) error {
+	stmt, err := r.db.Prepare("INSERT INTO tasks(filename, imei, status) values(?,?,?)")
+	if err != nil {
+		return err
+	}
+	_, err = stmt.Exec(task.File, task.IMEI, task.Status)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (r *HandshakeRepository) UpdateTaskState(task *models.Handshake) error {
+	stmt, err := r.db.Prepare("update tasks set status=? where imei=? and filename=?")
+	if err != nil {
+		return err
+	}
+
+	_, err = stmt.Exec(task.Status, task.IMEI, task.File)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (r *HandshakeRepository) GetFilesByIMEI(imei string)(files []string, err error){
+	rows, err := r.db.Query("SELECT file FROM handshakes WHERE imei='" + imei + "'")
+	if err != nil {
+		return  nil, err
+	}
+	var file string
+	for rows.Next() {
+		err = rows.Scan(&file)
+		if err != nil {
+			return nil, err
+		}
+		files = append(files, file)
+	}
+	rows.Close()
+	return files, nil
+}
+
+func(r *HandshakeRepository) GetHandshakesByFile(file string)(handshakes []*models.Handshake, err error){
+	rows, err := r.db.Query("SELECT mac, ssid, password FROM handshakes WHERE file='" + file + "'")
+	if err != nil {
+		return  nil, err
+	}
+	var handshake models.Handshake
+	for rows.Next() {
+		err = rows.Scan(&handshake.MAC, &handshake.SSID, &handshake.Password)
+		if err != nil {
+			return nil, err
+		}
+		handshakes = append(handshakes, &handshake)
+	}
+	rows.Close()
+	return handshakes, nil
+}
+
+func(r *HandshakeRepository) GetProgressByIMEI(imei string)(files []*models.Handshake, err error){
+	rows, err := r.db.Query("SELECT filename, status FROM tasks where imei = '" + imei + "'")
+	if err != nil {
+		return  nil, err
+	}
+	for rows.Next() {
+		var handshake models.Handshake
+		err = rows.Scan(&handshake.File, &handshake.Status)
+		if err != nil {
+			return nil, err
+		}
+		files = append(files, &handshake)
+	}
+	rows.Close()
+	return files, nil
+}

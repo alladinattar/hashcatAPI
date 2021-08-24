@@ -5,25 +5,24 @@ import (
 	"log"
 )
 
-type QueueRepo struct{
+type QueueRepo struct {
 	Ch *amqp.Channel
-
 }
 
-func NewQueue(channel *amqp.Channel)*QueueRepo {
+func NewQueue(channel *amqp.Channel) *QueueRepo {
 	return &QueueRepo{channel}
 }
 
-func (queue *QueueRepo) AddTask(task string)error{
+func (queue *QueueRepo) AddTask(task []byte) error {
 	q, err := queue.Ch.QueueDeclare(
 		"crackTasks", // name
-		false,   // durable
-		false,   // delete when unused
-		false,   // exclusive
-		false,   // no-wait
-		nil,     // arguments
+		false,        // durable
+		false,        // delete when unused
+		false,        // exclusive
+		false,        // no-wait
+		nil,          // arguments
 	)
-	if err!=nil{
+	if err != nil {
 		log.Println("Failed declare queue", err)
 		return err
 	}
@@ -33,12 +32,11 @@ func (queue *QueueRepo) AddTask(task string)error{
 		q.Name, // routing key
 		false,  // mandatory
 		false,  // immediate
-		amqp.Publishing {
-			DeliveryMode: amqp.Persistent,
+		amqp.Publishing{
 			ContentType: "text/plain",
-			Body:        []byte(task),
+			Body:        task,
 		})
-	if err!=nil{
+	if err != nil {
 		log.Println("Failed add new task", err)
 		return err
 	}

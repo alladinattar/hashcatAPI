@@ -1,6 +1,8 @@
 package handlers
 
 import (
+	"encoding/json"
+	"errors"
 	"fmt"
 	"github.com/hashcatAPI/models"
 	"io/ioutil"
@@ -18,27 +20,44 @@ func NewQueueHandler(repository models.HandshakeRepository, queue models.TasksQu
 	return &QueueHandler{repository, queue}
 }
 
+const handshakesDir = "./tempHandshakes/"
+const handshakeExtension = ".hccapx"
+
 func (h *QueueHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	fileName, err := h.receiveFile(r)
+	filename, err := h.receiveFile(r)
 	if err != nil {
 		log.Println("Failed recieve file:", err)
 		fmt.Fprint(w, "Failed recieve file: ", err)
 		return
 	}
-
-	err = h.Queue.AddTask(fileName)
-	if err != nil {
-		log.Println("Failed add task to queue", err)
-		fmt.Fprint(w, "Failed add task to queue", err)
+	if r.Header.Get("imei") == "" {
+		fmt.Fprint(w, "Empty imei field")
 		return
 	}
-	log.Println("Add new task: ", fileName)
 
+	var task = models.Handshake{File: filename, IMEI: r.Header.Get("imei"), Status: "Queue", Latitude: r.Header.Get("latitude"),
+		Longitude: r.Header.Get("longitude")}
+	data, err := json.MarshalIndent(task, "", "  ")
+	if err != nil {
+		log.Println("Failed marshall task", err)
+		w.WriteHeader(500)
+	}
+
+	err = h.Queue.AddTask(data)
+	if err != nil {
+		log.Println("Failed add task to queue", err)
+		w.WriteHeader(500)
+		return
+	}
+	log.Println("Added new task: ", filename)
 }
 
 func (h *QueueHandler) receiveFile(r *http.Request) (string, error) {
-	//fileName := r.Header.Get("filename")
-
+	if r.Header.Get("filename") == ""{
+		return "", errors.New("No filename header")
+	}else if r.Header.Get("imei") == ""{
+		return "", errors.New("No imei header")
+	}
 	err := r.ParseMultipartForm(10 << 20)
 	if err != nil {
 		return "", err
@@ -50,7 +69,8 @@ func (h *QueueHandler) receiveFile(r *http.Request) (string, error) {
 	}
 	defer file.Close()
 
-	uploadedFile, err := os.Create("test")
+	filename := handshakesDir + r.Header.Get("filename") + handshakeExtension
+	uploadedFile, err := os.Create(filename)
 	if err != nil {
 		return "", err
 	}

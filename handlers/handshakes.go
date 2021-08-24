@@ -19,32 +19,36 @@ func (h *HandshakesHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	switch r.Method {
 	case "GET":
-		log.Println("Send all handshakes")
-		handshakes, err := h.getHandshakes()
-		if err != nil {
-			log.Println("Failed get handshakes from db", err)
-			var resp Response
-			resp.Result = "Failed get handshakes from db"
-			resp.Comment = err.Error()
-			err := json.NewEncoder(w).Encode(resp)
-			if err != nil {
-				w.WriteHeader(400)
-			}
+		if r.Header.Get("imei")==""{
+			w.Write([]byte("No imei header"))
 			return
 		}
-		result, err := json.MarshalIndent(handshakes, "", "  ")
+
+		log.Println("Send handshakes for device with imei", r.Header.Get("imei"))
+		progress, err := h.getProgress(r.Header.Get("imei"))
+
+		if err != nil {
+			log.Println("Failed get handshakes from db", err)
+			w.Write([]byte("Failed get handshakes from db"))
+			return
+		}
+		progressData, err := json.MarshalIndent(progress, "", "  ")
 		if err != nil {
 			log.Println("Failed marshall result", err)
 		}
-		w.Write(result)
+		w.Write(progressData)
 		return
 	}
 }
 
-func (h *HandshakesHandler) getHandshakes() ([]*models.Handshake, error) {
-	handshakes, err := h.handshakeRepo.GetAll()
-	if err != nil {
+func( h *HandshakesHandler) getProgress(imei string)([]*models.Handshake, error){
+	progressFiles, err := h.handshakeRepo.GetProgressByIMEI(imei)
+	if err!=nil{
 		return nil, err
 	}
-	return handshakes, nil
+	return progressFiles, nil
+}
+
+func (h *HandshakesHandler) getHandshakes(imei string) (string, error) {
+	return "", nil
 }

@@ -4,14 +4,15 @@ import "os"
 
 type Handshake struct {
 	ID         int    `json:"-"`
-	MAC        string `json:"mac"`
-	SSID       string `json:"ssid"`
-	Encryption string `json:"encryption"`
-	Latitude   string `json:"latitude"`
-	Longitude  string `json:"longitude"`
-	IMEI       string `json:"imei"`
-	Time       string `json:"time"`
-	Password   string `json:"password"`
+	MAC        string `json:"mac,omitempty"`
+	SSID       string `json:"ssid,omitempty"`
+	Encryption string `json:"encryption,omitempty"`
+	Latitude   string `json:"latitude,omitempty"`
+	Longitude  string `json:"longitude,omitempty"`
+	IMEI       string `json:"imei,omitempty"`
+	Time       string `json:"time,omitempty"`
+	Password   string `json:"password,omitempty"`
+	File       string `json:"file,omitempty"`
 	Status     string `json:"status,omitempty"`
 }
 
@@ -20,6 +21,11 @@ type HandshakeRepository interface {
 	GetByID(ID int) (*Handshake, error)
 	GetByMAC(MAC string) ([]*Handshake, error)
 	GetAll() ([]*Handshake, error)
+	AddTaskToDB(*Handshake) error
+	UpdateTaskState(*Handshake) error
+	GetHandshakesByFile(file string)(handshakes []*Handshake, err error)
+	GetFilesByIMEI(imei string)(files []string, err error)
+	GetProgressByIMEI(imei string)(files []*Handshake, err error)
 }
 
 type Cracker interface {
@@ -27,5 +33,5 @@ type Cracker interface {
 }
 
 type TasksQueue interface {
-	AddTask(string)error
+	AddTask([]byte) error
 }
