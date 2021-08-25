@@ -17,8 +17,8 @@ func NewConsumer(repo models.HandshakeRepository, cracker models.Cracker) *Consu
 	return &Consumer{repo, cracker}
 }
 
-func (c *Consumer) StartConsumeTasks() {
-	conn, err := amqp.Dial("amqp://guest:guest@localhost:5672/")
+func (c *Consumer) StartConsumeTasks(login, password, addr string) {
+	conn, err := amqp.Dial("amqp://" + login + ":" + password + "@" + addr + "/")
 	if err != nil {
 		log.Fatal("Failed connect to queue", err)
 	}

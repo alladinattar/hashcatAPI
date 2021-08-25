@@ -12,11 +12,16 @@ type Config struct {
 	} `yaml:"server"`
 	Hashcat struct {
 		Wordlist string `yaml:"wordlist"`
-		Limit    int `yaml:"limit"`
+		Limit    int    `yaml:"limit"`
 	} `yaml:"hashcat"`
+	Queue struct {
+		Login      string `yaml:"login"`
+		Password   string `yaml:"password"`
+		Addr string `yaml:"addr"`
+	}`yaml:"queue"`
 }
 
-func ReadConfig() (*Config, error){
+func ReadConfig() (*Config, error) {
 	f, err := os.Open("config.yaml")
 	if err != nil {
 		log.Println("Failed open config")

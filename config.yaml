@@ -4,3 +4,8 @@ server:
 hashcat:
   wordlist: "/usr/share/wordlists/rockyou.txt"
   limit: 10000
+
+queue:
+  login: "guest"
+  password: "guest"
+  addr: "192.168.1.34:5672"

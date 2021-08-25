@@ -2,6 +2,7 @@ package app
 
 import (
 	"database/sql"
+	"fmt"
 	"github.com/hashcatAPI/queue"
 	"github.com/hashcatAPI/usecases"
 	"github.com/streadway/amqp"
@@ -13,10 +14,9 @@ import (
 	"github.com/hashcatAPI/repositories"
 )
 
-
 func Run() error {
 	cfg, err := ReadConfig()
-	if err!=nil{
+	if err != nil {
 		return err
 	}
 	db, err := sql.Open("sqlite3", "./data.db")
@@ -26,13 +26,14 @@ func Run() error {
 
 	DBSetup(db)
 	//RabbitMQ connection
-	conn, err := amqp.Dial("amqp://guest:guest@localhost:5672/")
-	if err!=nil{
-		log.Fatal("Failed connect to task queue", err)
+	fmt.Println("amqp://" + cfg.Queue.Login + ":" + cfg.Queue.Password + "@" + cfg.Queue.Addr + "/")
+	conn, err := amqp.Dial("amqp://" + cfg.Queue.Login + ":" + cfg.Queue.Password + "@" + cfg.Queue.Addr + "/")
+	if err != nil {
+		log.Fatal("Failed connect to task queue:", err)
 	}
 	defer conn.Close()
 	ch, err := conn.Channel()
-	if err!=nil{
+	if err != nil {
 		log.Fatal("Failed create channel queue", err)
 	}
 	defer ch.Close()
@@ -56,7 +57,7 @@ func Run() error {
 
 	//Queue declare
 	queueConsumer := queue.NewConsumer(repo, cracker)
-	go queueConsumer.StartConsumeTasks()
+	go queueConsumer.StartConsumeTasks(cfg.Queue.Login, cfg.Queue.Password, cfg.Queue.Addr)
 
 	err = s.ListenAndServe()
 	if err != nil {
