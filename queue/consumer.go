@@ -79,7 +79,7 @@ func (c *Consumer) StartConsumeTasks(login, password, addr string) {
 			}
 			err = c.bruteHandshake(&task)
 			if err != nil {
-				log.Println("Failed brute file ", task.File)
+				log.Println("Failed brute file ", task.File, ". Error: ", err)
 
 			}
 		}
