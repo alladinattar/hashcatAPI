@@ -43,8 +43,7 @@ func (ha *HashcatAdapter) CrackWPA(file *os.File) (crackedHandshakes []*models.H
 			return nil, err
 		}
 	} else {
-		log.Println("Hashcat error: ", status)
-		return []*models.Handshake{{Status: "Hashcat error"}}, errors.New("Hashcat error")
+		return []*models.Handshake{}, errors.New("Hashcat error " + strconv.Itoa(status))
 	}
 	return crackedHandshakes, nil
 }

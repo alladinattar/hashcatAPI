@@ -103,7 +103,6 @@ func (c *Consumer) bruteHandshake(task *models.Handshake) error {
 
 	handshakes, err := c.cracker.CrackWPA(file)
 	if err != nil {
-		log.Println("Crack tool error", err)
 		return err
 	}
 
