@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	"github.com/hashcatAPI/models"
 	"io/ioutil"
@@ -33,6 +32,9 @@ func (h *QueueHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if r.Header.Get("imei") == "" {
 		fmt.Fprint(w, "Empty imei field")
 		return
+	}else if r.Header.Get("filename") == ""{
+		fmt.Fprint(w, "Empty filename field")
+		return
 	}
 
 	var task = models.Handshake{File: filename, IMEI: r.Header.Get("imei"), Status: "Queue", Latitude: r.Header.Get("latitude"),
@@ -53,11 +55,6 @@ func (h *QueueHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *QueueHandler) receiveFile(r *http.Request) (string, error) {
-	if r.Header.Get("filename") == ""{
-		return "", errors.New("No filename header")
-	}else if r.Header.Get("imei") == ""{
-		return "", errors.New("No imei header")
-	}
 	err := r.ParseMultipartForm(10 << 20)
 	if err != nil {
 		return "", err

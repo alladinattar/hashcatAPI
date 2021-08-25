@@ -90,7 +90,7 @@ func (c *Consumer) StartConsumeTasks(login, password, addr string) {
 }
 
 func (c *Consumer) bruteHandshake(task *models.Handshake) error {
-	log.Println("Run hashcat with file ", task.File)
+	log.Println("Run hashcat with file", task.File)
 	file, err := os.Open(task.File)
 	if err != nil {
 		return err
