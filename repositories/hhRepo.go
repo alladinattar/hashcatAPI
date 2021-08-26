@@ -40,7 +40,7 @@ func (r *HandshakeRepository) GetAll() (handshakes []*models.Handshake, err erro
 
 func (r *HandshakeRepository) Save(handshake *models.Handshake) (int, error) {
 	affectedRows := 0
-	stmt, err := r.db.Prepare("INSERT INTO handshakes(mac , ssid , password, time,enctyption, longitude, latitude, imei, file) values(?,?,?,?,?,?,?,?)")
+	stmt, err := r.db.Prepare("INSERT INTO handshakes(mac , ssid , password, time,enctyption, longitude, latitude, imei, file) values(?,?,?,?,?,?,?,?,?)")
 	if err != nil {
 		log.Println("Failed prepare insert query", err)
 		return 0, nil
