@@ -2,6 +2,7 @@ package queue
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/hashcatAPI/models"
 	"github.com/streadway/amqp"
 	"log"
@@ -110,7 +111,7 @@ func (c *Consumer) bruteHandshake(task *models.Handshake) error {
 		}
 		return nil
 	} else {
-		log.Println("Cracked " + strconv.Itoa(len(handshakes)) + "in file " + task.File)
+		log.Println("Cracked " + strconv.Itoa(len(handshakes)) + "handshakes in file " + task.File)
 	}
 
 	c.SaveHandshakes(handshakes, task)
@@ -124,6 +125,7 @@ func (c *Consumer) bruteHandshake(task *models.Handshake) error {
 
 func (c *Consumer) SaveHandshakes(handshakes []*models.Handshake, task *models.Handshake) {
 	for _, handshake := range handshakes {
+		fmt.Println(handshake.File)
 		handshake.Latitude = task.Latitude
 		handshake.Longitude = task.Longitude
 		handshake.IMEI = task.IMEI
