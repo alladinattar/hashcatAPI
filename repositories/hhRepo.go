@@ -135,3 +135,15 @@ func(r *HandshakeRepository) GetProgressByIMEI(imei string)(files []*models.Hand
 	rows.Close()
 	return files, nil
 }
+
+func(r *HandshakeRepository) UpdatePasswordByMAC(mac string, password string)error{
+	stmt, err := r.db.Prepare("update handshakes set password=? where mac=?")
+	if err != nil {
+		return err
+	}
+	_, err = stmt.Exec(password, mac)
+	if err != nil {
+		return err
+	}
+	return nil
+}

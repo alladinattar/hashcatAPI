@@ -25,6 +25,7 @@ type HandshakeRepository interface {
 	UpdateTaskState(*Handshake) error
 	GetFilesByIMEI(imei string)(files []string, err error)
 	GetProgressByIMEI(imei string)(files []*Handshake, err error)
+	UpdatePasswordByMAC(mac string, password string)error
 }
 
 type Cracker interface {

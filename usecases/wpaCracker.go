@@ -60,11 +60,16 @@ func (ha HashcatAdapter) readPotfile(file *os.File) (crackedHandshakes []*models
 		return []*models.Handshake{}, nil
 	}
 	data := strings.Split(out.String(), "\n")
+	tmpMac := ""
 	for _, line := range data {
 		if line == "" {
 			break
 		}
 		separatedData := strings.Split(line, ":")
+		if tmpMac == separatedData[0]{
+			continue
+		}
+		tmpMac = separatedData[0]
 		response := models.Handshake{
 			Password:   separatedData[3],
 			SSID:       separatedData[2],
