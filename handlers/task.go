@@ -8,8 +8,6 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"strconv"
-	"time"
 )
 
 type QueueHandler struct {
@@ -72,12 +70,12 @@ func (h *QueueHandler) receiveFile(r *http.Request) (string, error) {
 	}
 	defer file.Close()
 
-	filename := handshakesDir + r.Header.Get("imei") + "-" + strconv.Itoa(int(time.Now().Unix())) + handshakeExtension
+	filename := handshakesDir + r.Header.Get("filename") + handshakeExtension
 	uploadedFile, err := os.Create(filename)
 	if err != nil {
 		return "", err
 	}
-	fmt.Println("Recieved file:", uploadedFile.Name())
+	fmt.Println("Recieved file:", filename)
 	defer uploadedFile.Close()
 	fileBytes, err := ioutil.ReadAll(file)
 	if err != nil {
