@@ -128,24 +128,12 @@ func (c *Consumer) SaveHandshakes(handshakes []*models.Handshake, task *models.H
 		handshake.Longitude = task.Longitude
 		handshake.IMEI = task.IMEI
 		handshake.File = task.File
-		check := c.checkHandshakeInDB(handshake)
-		if check {
-			_, err := c.repo.Save(handshake)
-			if err != nil {
-				log.Println("Failed save handshake", err)
-				continue
-			}
-			continue
-		} else {
-			log.Println("Invalid handshake. Incomplete device information received")
+		_, err := c.repo.Save(handshake)
+		if err != nil {
+			log.Println("Failed save handshake", err)
 			continue
 		}
 	}
 }
 
-func (c *Consumer) checkHandshakeInDB(handshake *models.Handshake) bool {
-	if handshake.SSID == "" || handshake.Password == "" || handshake.MAC == "" || handshake.IMEI == "" {
-		return false
-	}
-	return true
-}
+
