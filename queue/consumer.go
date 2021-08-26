@@ -112,6 +112,10 @@ func (c *Consumer) bruteHandshake(task *models.Handshake) error {
 		return nil
 	} else {
 		log.Println("Cracked " + strconv.Itoa(len(handshakes)) + "handshakes in file " + task.File)
+		err = c.repo.UpdateTaskState(&models.Handshake{File: file.Name(), IMEI: task.IMEI, Status: "Finished"})
+		if err!=nil{
+			log.Println("Failed update status of handshake: ", err)
+		}
 	}
 
 	c.SaveHandshakes(handshakes, task)
@@ -126,6 +130,7 @@ func (c *Consumer) bruteHandshake(task *models.Handshake) error {
 func (c *Consumer) SaveHandshakes(handshakes []*models.Handshake, task *models.Handshake) {
 	for _, handshake := range handshakes {
 		fmt.Println(handshake)
+		fmt.Println(task.File)
 		handshake.Latitude = task.Latitude
 		handshake.Longitude = task.Longitude
 		handshake.IMEI = task.IMEI
