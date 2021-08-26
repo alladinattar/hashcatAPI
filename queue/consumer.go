@@ -6,6 +6,7 @@ import (
 	"github.com/streadway/amqp"
 	"log"
 	"os"
+	"strconv"
 )
 
 type Consumer struct {
@@ -72,15 +73,10 @@ func (c *Consumer) StartConsumeTasks(login, password, addr string) {
 				log.Println("Failed unmarshall data from queue", err)
 				continue
 			}
-			err = c.repo.AddTaskToDB(&task)
-			if err != nil {
-				log.Println("Failed save task to db:", err)
-				continue
-			}
 			err = c.bruteHandshake(&task)
 			if err != nil {
 				log.Println("Failed brute file ", task.File, ". Error: ", err)
-
+				c.repo.UpdateTaskState(&models.Handshake{File: task.File, IMEI: task.IMEI, Status: "Failed"})
 			}
 		}
 	}()
@@ -113,6 +109,8 @@ func (c *Consumer) bruteHandshake(task *models.Handshake) error {
 			return err
 		}
 		return nil
+	} else {
+		log.Println("Cracked " + strconv.Itoa(len(handshakes)) + "in file " + task.File)
 	}
 
 	c.SaveHandshakes(handshakes, task)
@@ -133,7 +131,7 @@ func (c *Consumer) SaveHandshakes(handshakes []*models.Handshake, task *models.H
 		check := c.checkHandshakeInDB(handshake)
 		if check {
 			_, err := c.repo.Save(handshake)
-			if err!=nil{
+			if err != nil {
 				log.Println("Failed save handshake", err)
 				continue
 			}

@@ -59,7 +59,6 @@ func (ha HashcatAdapter) readPotfile(file *os.File) (crackedHandshakes []*models
 	if out.String() == "" {
 		return []*models.Handshake{}, nil
 	}
-	log.Println(string(out.Bytes()))
 	data := strings.Split(out.String(), "\n")
 	for _, line := range data {
 		if line == "" {

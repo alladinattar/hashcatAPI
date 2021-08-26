@@ -8,6 +8,8 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strconv"
+	"time"
 )
 
 type QueueHandler struct {
@@ -51,6 +53,10 @@ func (h *QueueHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(500)
 		return
 	}
+	err = h.handshakeRepo.AddTaskToDB(&task)
+	if err != nil {
+		log.Println("Failed save task to db:", err)
+	}
 	log.Println("Added new task: ", filename)
 }
 
@@ -66,11 +72,12 @@ func (h *QueueHandler) receiveFile(r *http.Request) (string, error) {
 	}
 	defer file.Close()
 
-	filename := handshakesDir + r.Header.Get("filename") + handshakeExtension
+	filename := handshakesDir + r.Header.Get("imei") + "-" + strconv.Itoa(int(time.Now().Unix())) + handshakeExtension
 	uploadedFile, err := os.Create(filename)
 	if err != nil {
 		return "", err
 	}
+	fmt.Println("Recieved file:", uploadedFile.Name())
 	defer uploadedFile.Close()
 	fileBytes, err := ioutil.ReadAll(file)
 	if err != nil {
@@ -78,5 +85,5 @@ func (h *QueueHandler) receiveFile(r *http.Request) (string, error) {
 	}
 
 	uploadedFile.Write(fileBytes)
-	return uploadedFile.Name(), nil
+	return filename, nil
 }
