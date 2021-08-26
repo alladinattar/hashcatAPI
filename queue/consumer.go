@@ -125,7 +125,7 @@ func (c *Consumer) bruteHandshake(task *models.Handshake) error {
 
 func (c *Consumer) SaveHandshakes(handshakes []*models.Handshake, task *models.Handshake) {
 	for _, handshake := range handshakes {
-		fmt.Println(handshake.File)
+		fmt.Println(handshake)
 		handshake.Latitude = task.Latitude
 		handshake.Longitude = task.Longitude
 		handshake.IMEI = task.IMEI
