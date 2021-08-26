@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"encoding/json"
-	"fmt"
 	"github.com/hashcatAPI/models"
 	"log"
 	"net/http"
@@ -44,13 +43,11 @@ func (h *ResultsHandler) getResults(imei string) (map[string][]models.Handshake,
 		return nil, err
 	}
 	for _, handshake := range allHandshakes{
-		fmt.Println(handshake.File)
 		if handshake.IMEI != imei{
 			continue
 		}
 		var handshakeTmp = models.Handshake{MAC: handshake.MAC, SSID: handshake.SSID, Password: handshake.Password}
 		result[handshake.File] = append(result[handshake.File], handshakeTmp)
-		fmt.Println(result)
 	}
 	return result, nil
 }
