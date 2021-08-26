@@ -71,7 +71,7 @@ func (h *QueueHandler) receiveFile(r *http.Request) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	uploadedFile.Close()
+	defer uploadedFile.Close()
 	fileBytes, err := ioutil.ReadAll(file)
 	if err != nil {
 		return "", err
