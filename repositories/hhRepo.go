@@ -22,14 +22,13 @@ func (r *HandshakeRepository) GetByID(ID int) (*models.Handshake, error) {
 }
 
 func (r *HandshakeRepository) GetAll() (handshakes []*models.Handshake, err error) {
-	rows, err := r.db.Query("SELECT * FROM handshakes")
+	rows, err := r.db.Query("SELECT mac, ssid, password, imei, file FROM handshakes")
 	if err != nil {
 		log.Println(err)
 	}
 	for rows.Next() {
 		handshake := &models.Handshake{}
-		err = rows.Scan(&handshake.ID, &handshake.MAC, &handshake.SSID, &handshake.Password, &handshake.Time,
-			&handshake.Encryption, &handshake.Longitude, &handshake.Latitude, &handshake.IMEI)
+		err = rows.Scan(&handshake.MAC, &handshake.SSID, &handshake.Password, &handshake.IMEI, &handshake.File)
 		if err != nil {
 			log.Println(err)
 		}
@@ -119,22 +118,6 @@ func (r *HandshakeRepository) GetFilesByIMEI(imei string)(files []string, err er
 	return files, nil
 }
 
-func(r *HandshakeRepository) GetHandshakesByFile(file string)(handshakes []*models.Handshake, err error){
-	rows, err := r.db.Query("SELECT mac, ssid, password FROM handshakes WHERE file='" + file + "'")
-	if err != nil {
-		return  nil, err
-	}
-	var handshake models.Handshake
-	for rows.Next() {
-		err = rows.Scan(&handshake.MAC, &handshake.SSID, &handshake.Password)
-		if err != nil {
-			return nil, err
-		}
-		handshakes = append(handshakes, &handshake)
-	}
-	rows.Close()
-	return handshakes, nil
-}
 
 func(r *HandshakeRepository) GetProgressByIMEI(imei string)(files []*models.Handshake, err error){
 	rows, err := r.db.Query("SELECT filename, status FROM tasks where imei = '" + imei + "'")

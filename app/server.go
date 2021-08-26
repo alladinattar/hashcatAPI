@@ -42,12 +42,12 @@ func Run() error {
 
 	repo := repositories.NewHandshakeRepository(db)
 	cracker := usecases.NewHashcat(cfg.Hashcat.Wordlist, cfg.Hashcat.Limit)
-	handlerDB := handlers.NewHandshakes(repo)
+	handlerDB := handlers.NewProgressHandler(repo)
 	queueHandler := handlers.NewQueueHandler(repo, queueRepo)
 	router := mux.NewRouter()
-
-	router.Handle("/handshakes", handlerDB).Methods("GET")
-	router.Handle("/result", handlerDB).Methods("GET")
+	resultsHandler := handlers.NewResultsHandler(repo)
+	router.Handle("/progress", handlerDB).Methods("GET")
+	router.Handle("/results", resultsHandler).Methods("GET")
 	router.Handle("/task", queueHandler).Methods("POST")
 
 	s := http.Server{

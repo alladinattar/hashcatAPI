@@ -23,7 +23,6 @@ type HandshakeRepository interface {
 	GetAll() ([]*Handshake, error)
 	AddTaskToDB(*Handshake) error
 	UpdateTaskState(*Handshake) error
-	GetHandshakesByFile(file string)(handshakes []*Handshake, err error)
 	GetFilesByIMEI(imei string)(files []string, err error)
 	GetProgressByIMEI(imei string)(files []*Handshake, err error)
 }
