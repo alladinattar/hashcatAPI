@@ -56,8 +56,8 @@ func Run() error {
 	}
 
 	//Queue declare
-	queueConsumer := queue.NewConsumer(repo, cracker)
-	go queueConsumer.StartConsumeTasks(cfg.Queue.Login, cfg.Queue.Password, cfg.Queue.Addr)
+	// queueConsumer := queue.NewConsumer(repo, cracker)
+	// go queueConsumer.StartConsumeTasks(cfg.Queue.Login, cfg.Queue.Password, cfg.Queue.Addr)
 
 	err = s.ListenAndServe()
 	if err != nil {
