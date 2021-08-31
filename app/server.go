@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	"github.com/hashcatAPI/queue"
-//	"github.com/hashcatAPI/usecases"
+	"github.com/hashcatAPI/usecases"
 	"github.com/streadway/amqp"
 	"log"
 	"net/http"
@@ -41,7 +41,7 @@ func Run() error {
 	queueRepo := queue.NewQueue(ch)
 
 	repo := repositories.NewHandshakeRepository(db)
-	//cracker := usecases.NewHashcat(cfg.Hashcat.Wordlist, cfg.Hashcat.Limit)
+	cracker := usecases.NewHashcat(cfg.Hashcat.Wordlist, cfg.Hashcat.Limit)
 	handlerDB := handlers.NewProgressHandler(repo)
 	queueHandler := handlers.NewQueueHandler(repo, queueRepo)
 	router := mux.NewRouter()
@@ -56,8 +56,8 @@ func Run() error {
 	}
 
 	//Queue declare
-	// queueConsumer := queue.NewConsumer(repo, cracker)
-	// go queueConsumer.StartConsumeTasks(cfg.Queue.Login, cfg.Queue.Password, cfg.Queue.Addr)
+	queueConsumer := queue.NewConsumer(repo, cracker)
+	go queueConsumer.StartConsumeTasks(cfg.Queue.Login, cfg.Queue.Password, cfg.Queue.Addr)
 
 	err = s.ListenAndServe()
 	if err != nil {

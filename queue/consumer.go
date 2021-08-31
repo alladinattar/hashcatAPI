@@ -53,7 +53,7 @@ func (c *Consumer) StartConsumeTasks(login, password, addr string) {
 	msgs, err := ch.Consume(
 		q.Name, // queue
 		"",     // consumer
-		true,   // auto-ack
+		false,   // auto-ack
 		false,  // exclusive
 		false,  // no-local
 		false,  // no-wait
@@ -79,6 +79,7 @@ func (c *Consumer) StartConsumeTasks(login, password, addr string) {
 				log.Println("Failed brute file ", task.File, ". Error: ", err)
 				c.repo.UpdateTaskState(&models.Handshake{File: task.File, IMEI: task.IMEI, Status: "Failed"})
 			}
+			d.Ack(false)
 		}
 	}()
 
