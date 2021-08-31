@@ -41,7 +41,7 @@ func Run() error {
 	queueRepo := queue.NewQueue(ch)
 
 	repo := repositories.NewHandshakeRepository(db)
-	cracker := usecases.NewHashcat(cfg.Hashcat.Wordlist, cfg.Hashcat.Limit)
+	//cracker := usecases.NewHashcat(cfg.Hashcat.Wordlist, cfg.Hashcat.Limit)
 	handlerDB := handlers.NewProgressHandler(repo)
 	queueHandler := handlers.NewQueueHandler(repo, queueRepo)
 	router := mux.NewRouter()
