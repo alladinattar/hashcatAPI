@@ -33,7 +33,7 @@ func (c *Consumer) StartConsumeTasks(login, password, addr string) {
 	defer ch.Close()
 	q, err := ch.QueueDeclare(
 		"crackTasks", // name
-		false,        // durable
+		true,        // durable
 		false,        // delete when unused
 		false,        // exclusive
 		false,        // no-wait

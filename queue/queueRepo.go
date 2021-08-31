@@ -16,7 +16,7 @@ func NewQueue(channel *amqp.Channel) *QueueRepo {
 func (queue *QueueRepo) AddTask(task []byte) error {
 	q, err := queue.Ch.QueueDeclare(
 		"crackTasks", // name
-		false,        // durable
+		true,        // durable
 		false,        // delete when unused
 		false,        // exclusive
 		false,        // no-wait
