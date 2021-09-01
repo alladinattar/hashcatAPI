@@ -9,4 +9,3 @@ queue:
   login: "guest"
   password: "guest"
   addr: "localhost:5672"
-  workers: 2
