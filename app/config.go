@@ -18,6 +18,7 @@ type Config struct {
 		Login      string `yaml:"login"`
 		Password   string `yaml:"password"`
 		Addr string `yaml:"addr"`
+		Workers int `yaml:"workers`
 	}`yaml:"queue"`
 }
 
