@@ -57,7 +57,7 @@ func Run() error {
 
 	//Queue declare
 	queueConsumer := queue.NewConsumer(repo, cracker)
-	for k := 0;k<cfg.queue.workers;k++{
+	for k := 0;k<cfg.Queue.workers;k++{
 		go queueConsumer.StartConsumeTasks(cfg.Queue.Login, cfg.Queue.Password, cfg.Queue.Addr)
 	}
 
