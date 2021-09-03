@@ -106,17 +106,8 @@ func (c *Consumer) bruteHandshake(task *models.Handshake) error {
 
 	if len(handshakes) == 0 {
 		log.Println("No cracked handshakes in ", file.Name())
-		err := c.repo.UpdateTaskState(&models.Handshake{File: file.Name(), IMEI: task.IMEI, Status: "Finished"})
-		if err != nil {
-			return err
-		}
-		return nil
 	} else {
 		log.Println("Cracked " + strconv.Itoa(len(handshakes)) + " handshakes in file " + task.File)
-		err = c.repo.UpdateTaskState(&models.Handshake{File: file.Name(), IMEI: task.IMEI, Status: "Finished"})
-		if err != nil {
-			log.Println("Failed update status of handshake: ", err)
-		}
 	}
 
 	c.SaveHandshakes(handshakes, task)
@@ -144,11 +135,3 @@ func (c *Consumer) SaveHandshakes(handshakes []*models.Handshake, task *models.H
 	}
 }
 
-/*func(c *Consumer) checkHandshake(handshake *models.Handshake)(bool){
-	handshakes, _ := c.repo.GetByMAC(handshake.MAC)
-	if len(handshakes)!=0{
-		return false
-	}
-	return true
-}
-*/
