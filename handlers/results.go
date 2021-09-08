@@ -46,7 +46,7 @@ func (h *ResultsHandler) getResults(imei string) (map[string][]models.Handshake,
 		if handshake.IMEI != imei{
 			continue
 		}
-		var handshakeTmp = models.Handshake{MAC: handshake.MAC, SSID: handshake.SSID, Password: handshake.Password}
+		var handshakeTmp = models.Handshake{MAC: handshake.MAC, SSID: handshake.SSID, Password: handshake.Password, Latitude: handshake.Latitude, Longitude: handshake.Longitude}
 		result[handshake.File] = append(result[handshake.File], handshakeTmp)
 	}
 	return result, nil
