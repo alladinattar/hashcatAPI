@@ -23,7 +23,7 @@ func Run() error {
 	if err != nil {
 		log.Fatal(err)
 	}
-
+	defer db.Close()
 	DBSetup(db)
 	//RabbitMQ connection
 	fmt.Println("amqp://" + cfg.Queue.Login + ":" + cfg.Queue.Password + "@" + cfg.Queue.Addr + "/")
