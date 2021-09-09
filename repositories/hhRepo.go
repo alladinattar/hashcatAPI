@@ -162,7 +162,7 @@ func(r *HandshakeRepository) UpdatePasswordByMAC(mac string, password string)err
 }
 
 func (r *HandshakeRepository) GetAllCrackedHandshakesByIMEI(imei string)(handshakes []*models.Handshake, err error){
-	rows, err := r.db.Query("SELECT mac, ssid, password, longitude, latitude FROM tasks where imei = '" + imei + "'")
+	rows, err := r.db.Query("SELECT mac, ssid, password, longitude, latitude FROM originhandshakes where imei = '" + imei + "'")
 	if err != nil {
 		return  nil, err
 	}
