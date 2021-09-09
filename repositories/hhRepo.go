@@ -43,13 +43,13 @@ func (r *HandshakeRepository) Save(handshake *models.Handshake) (int, error) {
 	stmt, err := r.db.Prepare("INSERT INTO handshakes(mac , ssid , password, time,enctyption, longitude, latitude, imei, file) values(?,?,?,?,?,?,?,?,?)")
 	if err != nil {
 		log.Println("Failed prepare insert query", err)
-		return 0, nil
+		return 0, err
 	}
 
 	result, err := stmt.Exec(handshake.MAC, handshake.SSID, handshake.Password, handshake.Time, handshake.Encryption, handshake.Longitude, handshake.Latitude, handshake.IMEI, handshake.File)
 	if err != nil {
 		log.Println("Failed exec insert query", err)
-		return 0, nil
+		return 0, err
 	}
 	rowsAffected, err := result.RowsAffected()
 	if err != nil {
@@ -57,6 +57,21 @@ func (r *HandshakeRepository) Save(handshake *models.Handshake) (int, error) {
 	}
 	affectedRows += int(rowsAffected)
 	return affectedRows, nil
+}
+
+func (r *HandshakeRepository) SaveOriginHandshake(handshake *models.Handshake)(error){
+	stmt, err := r.db.Prepare("INSERT INTO originhandshakes(mac, ssid, password, imei, longitude, latitude) values(?,?,?,?,?,?)")
+	if err != nil {
+		log.Println("Failed prepare insert query", err)
+		return err
+	}
+
+	_, err = stmt.Exec(handshake.MAC, handshake.SSID, handshake.Password, handshake.IMEI, handshake.Longitude, handshake.Latitude)
+	if err != nil {
+		log.Println("Failed exec insert query", err)
+		return err
+	}
+	return nil
 }
 
 func (r *HandshakeRepository) GetByMAC(MAC string) (handshakes []*models.Handshake, err error) {
@@ -137,7 +152,7 @@ func(r *HandshakeRepository) GetProgressByIMEI(imei string)(files []*models.Hand
 }
 
 func(r *HandshakeRepository) UpdatePasswordByMAC(mac string, password string)error{
-	stmt, err := r.db.Prepare("update handshakes set password=? where mac=?")
+	stmt, err := r.db.Prepare("update originhandshakes set password=? where mac=?")
 	if err != nil {
 		return err
 	}

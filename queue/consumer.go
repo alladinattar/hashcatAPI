@@ -2,7 +2,6 @@ package queue
 
 import (
 	"encoding/json"
-	"fmt"
 	"github.com/hashcatAPI/models"
 	"github.com/streadway/amqp"
 	"log"
@@ -121,8 +120,7 @@ func (c *Consumer) bruteHandshake(task *models.Handshake) error {
 
 func (c *Consumer) SaveHandshakes(handshakes []*models.Handshake, task *models.Handshake) {
 	for _, handshake := range handshakes {
-		fmt.Println(handshake)
-		fmt.Println(task.File)
+		log.Println("Cracked BSSID: ", handshake.MAC, "Password: ", handshake.Password, "File: ", task.File)
 		handshake.Latitude = task.Latitude
 		handshake.Longitude = task.Longitude
 		handshake.IMEI = task.IMEI
@@ -132,6 +130,29 @@ func (c *Consumer) SaveHandshakes(handshakes []*models.Handshake, task *models.H
 			log.Println("Failed save handshake", err)
 			continue
 		}
+		if !c.handshakeExists(handshake.MAC){
+			err = c.repo.SaveOriginHandshake(handshake)
+			if err!=nil{
+				log.Println("Failed save original handshake: ", err)
+				continue
+			}
+		}else{
+			err = c.repo.UpdatePasswordByMAC(handshake.MAC, handshake.Password)
+			if err!=nil{
+				log.Println("Failed update password of exists handshake", err)
+				continue
+			}
+		}
 	}
 }
 
+func (c *Consumer)handshakeExists(mac string)bool{
+	result, err := c.repo.GetByMAC(mac)
+	if err!=nil{
+		log.Println("Failed get handshake by MAC address")
+	}
+	if len(result)!=0{
+		return true
+	}
+	return false
+}

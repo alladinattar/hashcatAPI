@@ -24,6 +24,15 @@ func DBSetup(db *sql.DB) {
 	if err!=nil{
 		log.Fatal("Failed create table with tasks: ", err)
 	}
+
+
+	tableWithOrOriginHandshakes := fmt.Sprint("CREATE TABLE IF NOT EXISTS originhandshakes (id INTEGER PRIMARY KEY,",
+		"mac TEXT, ssid TEXT, password TEXT, imei TEXT, longitude TEXT, latitude TEXT)")
+	statement, _ = db.Prepare(tableWithOrOriginHandshakes)
+	_, err = statement.Exec()
+	if err!=nil{
+		log.Fatal("Failed create table with original handshakes: ", err)
+	}
 	defer statement.Close()
 }
 
