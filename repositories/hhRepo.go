@@ -73,7 +73,7 @@ func (r *HandshakeRepository) SaveOriginHandshake(handshake *models.Handshake)(e
 }
 
 func (r *HandshakeRepository) GetByMAC(MAC string) (handshakes []*models.Handshake, err error) {
-	rows, err := r.db.Query("SELECT mac FROM handshakes WHERE mac='" + MAC + "'")
+	rows, err := r.db.Query("SELECT mac FROM originhandshakes WHERE mac='" + MAC + "'")
 	if err != nil {
 		return nil, err
 	}
