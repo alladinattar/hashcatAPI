@@ -130,8 +130,8 @@ func (c *Consumer) SaveHandshakes(handshakes []*models.Handshake, task *models.H
 			log.Println("Failed save handshake", err)
 			continue
 		}
-		if !c.handshakeExists(handshake.MAC){
-			log.Println("Handshake already exists")
+		if c.handshakeExists(handshake.MAC){
+			log.Println("Handshake already exists. Update password")
 			err = c.repo.UpdatePasswordByMAC(handshake.MAC, handshake.Password)
 			if err!=nil{
 				log.Println("Failed update password of exists handshake", err)
