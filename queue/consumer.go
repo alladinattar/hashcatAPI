@@ -130,7 +130,7 @@ func (c *Consumer) SaveHandshakes(handshakes []*models.Handshake, task *models.H
 			log.Println("Failed save handshake", err)
 			continue
 		}
-		if c.handshakeExists(handshake.MAC){
+		if !c.handshakeExists(handshake.MAC){
 			log.Println("Handshake already exists")
 			err = c.repo.UpdatePasswordByMAC(handshake.MAC, handshake.Password)
 			if err!=nil{
@@ -153,6 +153,8 @@ func (c *Consumer)handshakeExists(mac string)bool{
 	if err!=nil{
 		log.Println("Failed get handshake by MAC address")
 	}
+	log.Println("Len of array by mac: ", len(result))
+	log.Println("Resutl by mac: ", result)
 	if result!=nil{
 		return true
 	}
