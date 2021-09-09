@@ -151,7 +151,7 @@ func (c *Consumer)handshakeExists(mac string)bool{
 	if err!=nil{
 		log.Println("Failed get handshake by MAC address")
 	}
-	if len(result)!=0{
+	if result!=nil{
 		return true
 	}
 	return false
