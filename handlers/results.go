@@ -22,7 +22,8 @@ func (h *ResultsHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	result, err := h.getResults(r.Header.Get("imei"))
+
+	result, err := h.handshakeRepo.GetAllCrackedHandshakesByIMEI(r.Header.Get("imei"))
 	if err!=nil{
 		log.Println("Failed get handshakes by file: ", err)
 	}
@@ -36,18 +37,3 @@ func (h *ResultsHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	log.Println("Send results for device with imei", r.Header.Get("imei"))
 }
 
-func (h *ResultsHandler) getResults(imei string) (map[string][]models.Handshake, error) {
-	result := make(map[string][]models.Handshake)
-	allHandshakes, err := h.handshakeRepo.GetAll()
-	if err!=nil{
-		return nil, err
-	}
-	for _, handshake := range allHandshakes{
-		if handshake.IMEI != imei{
-			continue
-		}
-		var handshakeTmp = models.Handshake{MAC: handshake.MAC, SSID: handshake.SSID, Password: handshake.Password, Latitude: handshake.Latitude, Longitude: handshake.Longitude}
-		result[handshake.File] = append(result[handshake.File], handshakeTmp)
-	}
-	return result, nil
-}

@@ -17,9 +17,7 @@ func NewHandshakeRepository(db *sql.DB) *HandshakeRepository {
 	}
 }
 
-func (r *HandshakeRepository) GetByID(ID int) (*models.Handshake, error) {
-	return &models.Handshake{}, nil
-}
+
 
 func (r *HandshakeRepository) GetAll() (handshakes []*models.Handshake, err error) {
 	rows, err := r.db.Query("SELECT mac, ssid, password, imei, file FROM handshakes")
@@ -161,4 +159,22 @@ func(r *HandshakeRepository) UpdatePasswordByMAC(mac string, password string)err
 		return err
 	}
 	return nil
+}
+
+func (r *HandshakeRepository) GetAllCrackedHandshakesByIMEI(imei string)(handshakes []*models.Handshake, err error){
+	rows, err := r.db.Query("SELECT mac, ssid, password, longitude, latitude FROM tasks where imei = '" + imei + "'")
+	if err != nil {
+		return  nil, err
+	}
+	for rows.Next() {
+		var handshake models.Handshake
+		err = rows.Scan(&handshake.MAC, &handshake.SSID, &handshake.Password, &handshake.Longitude, &handshake.Latitude)
+		if err != nil {
+			log.Println("Failed scan origin handshake: ", err)
+			continue
+		}
+		handshakes = append(handshakes, &handshake)
+	}
+	rows.Close()
+	return handshakes, nil
 }
